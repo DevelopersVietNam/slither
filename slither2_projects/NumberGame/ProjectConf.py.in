@@ -1,0 +1,20 @@
+BASE_PROJECT_DIR = '/home/pshafae/www/cgi-bin/slither_projects'
+
+DOCROOT = '%s/NumberGame/Files'%( BASE_PROJECT_DIR )
+
+SESSION_DIR = '%s/session'%( DOCROOT )
+LOG_DIR     = '%s/logs'%( DOCROOT )
+
+
+LOG_FILE_NAME = '%s/NumberGame'%( LOG_DIR )
+
+HTML_SEARCH_PATH = [ '.', '%s/NumberGame'%(BASE_PROJECT_DIR) ]
+
+LOCAL_PROPS = {
+
+   'log_file_name' : '%s/NumberGame'%( LOG_DIR ) ,
+   'user_profile_dir' : SESSION_DIR,
+   'encode_target' : 'BasicTemplate.html',
+   'search_path' : HTML_SEARCH_PATH,
+
+}
