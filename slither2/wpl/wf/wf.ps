@@ -1,0 +1,9327 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 24 24 588 768
+%%Title: Enscript Output
+%%For: George K. Thiruvathukal
+%%Creator: GNU enscript 1.6.1
+%%CreationDate: Thu Jan  4 05:58:38 2001
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 1
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 1
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 1
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 744 def
+/d_page_h 564 def
+/d_header_x 0 def
+/d_header_y 528 def
+/d_header_w 744 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 744 def
+/d_footer_h 0 def
+/d_output_w 744 def
+/d_output_h 528 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 1 def
+/fname (WebForm.py) def
+/fdir () def
+/ftail (WebForm.py) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (01/03/01) def
+/modtimestr (18:47:25) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+/Courier-Bold 7 7 SUF
+5 518 M
+(""") s
+5 510 M
+(The new WebForm module.) s
+5 502 M
+(New documentation is forthcoming.) s
+5 494 M
+(""") s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+5 478 M
+(import) s
+/F-gs-font 7 7 SF
+30.2 478 M
+( os, string, os.path, cgi) s
+/Courier-Bold 7 7 SUF
+5 470 M
+(import) s
+/F-gs-font 7 7 SF
+30.2 470 M
+( sys, traceback) s
+/Courier-Bold 7 7 SUF
+5 462 M
+(import) s
+/F-gs-font 7 7 SF
+30.2 462 M
+( StringIO) s
+/Courier-Bold 7 7 SUF
+5 454 M
+(import) s
+/F-gs-font 7 7 SF
+30.2 454 M
+( ConfigParser) s
+/Courier-Bold 7 7 SUF
+5 438 M
+(import) s
+/F-gs-font 7 7 SF
+30.2 438 M
+( WriteProcessor, SimpleWriter, Emitter) s
+/Courier-Bold 7 7 SUF
+5 430 M
+(import) s
+/F-gs-font 7 7 SF
+30.2 430 M
+( hwStackTrace) s
+/Courier-Bold 7 7 SUF
+5 422 M
+(from) s
+/F-gs-font 7 7 SF
+21.8 422 M
+( Directory ) s
+/Courier-Bold 7 7 SUF
+68 422 M
+(import) s
+/F-gs-font 7 7 SF
+93.2 422 M
+( Directory) s
+/Courier-Bold 7 7 SUF
+5 414 M
+(from) s
+/F-gs-font 7 7 SF
+21.8 414 M
+( SimpleCookie ) s
+/Courier-Bold 7 7 SUF
+80.6 414 M
+(import) s
+/F-gs-font 7 7 SF
+105.8 414 M
+( SimpleCookie) s
+/Courier-Bold 7 7 SUF
+5 398 M
+(class) s
+/F-gs-font 7 7 SF
+26 398 M
+( WebForm:) s
+5 390 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 390 M
+(""") s
+5 382 M
+(    The WebForm class. It is expected that any class wanting to use the) s
+5 374 M
+(    WebForm pattern will be a subclass. Many of its benefits come from) s
+5 366 M
+(    interaction with the class' namespace.) s
+5 358 M
+(    """) s
+/F-gs-font 7 7 SF
+5 350 M
+(    ) s
+5 342 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 342 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 342 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 342 M
+(__init__) s
+/F-gs-font 7 7 SF
+72.2 342 M
+(\(self, form, **props\):) s
+5 334 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 334 M
+(""") s
+5 326 M
+(        Construction has become quite a bit different in this release of) s
+5 318 M
+(        WebForm. Instead of having so many parameters to the constructor,) s
+5 310 M
+(        keyword parameters are now used, which is equivalent to a property) s
+5 302 M
+(        based system. Only things that are absolutely required, such as the) s
+5 294 M
+(        cgi.FieldStorage\(\) form data are present.) s
+5 270 M
+(        The following properties are available:) s
+5 262 M
+(           default_vars - A directory containing some default variables. These) s
+5 254 M
+(              are typically "seed" values that are to be treated as form ) s
+5 246 M
+(              variables. For example, if you are expecting an input 'username',) s
+5 238 M
+(              you can put it in a dictionary of defaults. This value would be) s
+5 230 M
+(              assigned to 'username', if 'username' is not found in the ) s
+5 222 M
+(              form.) s
+5 214 M
+( ) s
+5 206 M
+(           search_path - A list of directories to search for HTML. By default) s
+5 198 M
+(              search_path = ['.'], the current working directory.) s
+5 190 M
+(             ) s
+5 182 M
+(           content_type - None | 'text/html' | 'text/plain' | 'other valid enc') s
+5 174 M
+(              If content_type is set to None, no content header is emitted.) s
+5 158 M
+(           use_cookies = 'yes' | 'no' | None) s
+5 150 M
+(              Use cookies. 'yes' means to use them, 'no' means don't use them.) s
+5 142 M
+(              None may be used instead of 'no'.) s
+5 126 M
+(           emit_strategy = 'string' | 'list' | 'stdout' | object \(instance of) s
+5 118 M
+(              Emitter\). If you use 'string', 'list', or 'stdout', you can use) s
+5 110 M
+(              getEmiter\(\) to get the Emitter.) s
+5 94 M
+(           stdout = Where to send standard output. The only option is to ) s
+5 86 M
+(              specify sys.stderr, a StringIO object, or a file. By default) s
+5 78 M
+(              output to sys.stdout goes to a string I/O object.) s
+5 62 M
+(           ) s
+5 54 M
+(           config_dir - where to find the configuration file. By default,) s
+5 46 M
+(              the 'config_dir' == '.', the current working directory.) s
+5 30 M
+(           read_config_file = 'yes' | 'no') s
+5 14 M
+(           bind = prefix | None. 'm_' is the default value. To use this) s
+5 6 M
+(              feature, we require that the prefix end in '_', to avoid) s
+377 518 M
+(              conflicts with any attribute in the object. Setting bind) s
+377 510 M
+(              to None will not setattr.) s
+377 494 M
+(        """) s
+/F-gs-font 7 7 SF
+377 478 M
+(        stdout_capture = StringIO.StringIO\(\)) s
+377 462 M
+(        default_props = {) s
+377 454 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 454 M
+('default_vars') s
+/F-gs-font 7 7 SF
+482 454 M
+( : {},) s
+377 446 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 446 M
+('search_path') s
+/F-gs-font 7 7 SF
+477.8 446 M
+( : [) s
+/Courier-Bold 7 7 SUF
+494.6 446 M
+('.') s
+/F-gs-font 7 7 SF
+507.2 446 M
+(],) s
+377 438 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 438 M
+('content_type') s
+/F-gs-font 7 7 SF
+482 438 M
+( : ) s
+/Courier-Bold 7 7 SUF
+494.6 438 M
+('text/html') s
+/F-gs-font 7 7 SF
+540.8 438 M
+(,) s
+377 430 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 430 M
+('use_cookies') s
+/F-gs-font 7 7 SF
+477.8 430 M
+( : ) s
+/Courier-Bold 7 7 SUF
+490.4 430 M
+('yes') s
+/F-gs-font 7 7 SF
+511.4 430 M
+(,) s
+377 422 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 422 M
+('emit_strategy') s
+/F-gs-font 7 7 SF
+486.2 422 M
+( : ) s
+/Courier-Bold 7 7 SUF
+498.8 422 M
+('stdout') s
+/F-gs-font 7 7 SF
+532.4 422 M
+(,) s
+377 414 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 414 M
+('stdout') s
+/F-gs-font 7 7 SF
+456.8 414 M
+( : stdout_capture,) s
+377 406 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 406 M
+('config_dir') s
+/F-gs-font 7 7 SF
+473.6 406 M
+( : ) s
+/Courier-Bold 7 7 SUF
+486.2 406 M
+('.') s
+/F-gs-font 7 7 SF
+498.8 406 M
+(,) s
+377 398 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 398 M
+('read_config_file') s
+/F-gs-font 7 7 SF
+498.8 398 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 398 M
+('yes') s
+/F-gs-font 7 7 SF
+532.4 398 M
+(,) s
+377 390 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 390 M
+('prefix') s
+/F-gs-font 7 7 SF
+456.8 390 M
+( : ) s
+/Courier-Bold 7 7 SUF
+469.4 390 M
+('m_') s
+/F-gs-font 7 7 SF
+486.2 390 M
+( ) s
+377 382 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 382 M
+('encode_target') s
+/F-gs-font 7 7 SF
+486.2 382 M
+( : None) s
+377 374 M
+(        }) s
+377 366 M
+(  ) s
+377 350 M
+(        self.form = form) s
+377 334 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 334 M
+(# Set the initial values for unset properties.) s
+/F-gs-font 7 7 SF
+377 326 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 326 M
+(for) s
+/F-gs-font 7 7 SF
+423.2 326 M
+( prop_name ) s
+/Courier-Bold 7 7 SUF
+469.4 326 M
+(in) s
+/F-gs-font 7 7 SF
+477.8 326 M
+( default_props.keys\(\):) s
+377 318 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 318 M
+(if) s
+/F-gs-font 7 7 SF
+435.8 318 M
+( ) s
+/Courier-Bold 7 7 SUF
+440 318 M
+(not) s
+/F-gs-font 7 7 SF
+452.6 318 M
+( props.has_key\(prop_name\):) s
+377 310 M
+(               props[prop_name] = default_props[prop_name]) s
+377 294 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 294 M
+(# Check the values using the internal check methods.) s
+/F-gs-font 7 7 SF
+377 278 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 278 M
+(for) s
+/F-gs-font 7 7 SF
+423.2 278 M
+( prop_name ) s
+/Courier-Bold 7 7 SUF
+469.4 278 M
+(in) s
+/F-gs-font 7 7 SF
+477.8 278 M
+( default_props.keys\(\):) s
+377 270 M
+(            check_method_name = ) s
+/Courier-Bold 7 7 SUF
+511.4 270 M
+('__check_%s') s
+/F-gs-font 7 7 SF
+561.8 270 M
+( % prop_name) s
+377 262 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 262 M
+(if) s
+/F-gs-font 7 7 SF
+435.8 262 M
+( hasattr\(self, check_method_name\):) s
+377 254 M
+(               check_method = getattr\(self, check_method_name\)) s
+377 246 M
+(               new_value = self.check_method\(props[prop_name], default_props[prop_name) s
+377 238 M
+(]\)) s
+377 230 M
+(               setattr\(self, prop_name, new_value\)) s
+377 214 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 214 M
+(if) s
+/F-gs-font 7 7 SF
+419 214 M
+( self.read_config_file == ) s
+/Courier-Bold 7 7 SUF
+528.2 214 M
+('yes') s
+/F-gs-font 7 7 SF
+549.2 214 M
+(:) s
+377 206 M
+(           conf_vars = self.__parse_config_file\(\)) s
+377 198 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 198 M
+(else) s
+/F-gs-font 7 7 SF
+427.4 198 M
+(:) s
+377 190 M
+(           conf_vars = {}) s
+377 174 M
+(        self.cookies = []) s
+377 166 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 166 M
+(if) s
+/F-gs-font 7 7 SF
+419 166 M
+( self.use_cookies == ) s
+/Courier-Bold 7 7 SUF
+507.2 166 M
+('yes') s
+/F-gs-font 7 7 SF
+528.2 166 M
+(:) s
+377 158 M
+(           cookie = self.__load_cookie\(\)) s
+377 150 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 150 M
+(if) s
+/F-gs-font 7 7 SF
+431.6 150 M
+( cookie != None:) s
+377 142 M
+(               self.cookies.append\(cookie\)) s
+377 134 M
+(               self.startingCookieCount = 1) s
+377 126 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 126 M
+(else) s
+/F-gs-font 7 7 SF
+440 126 M
+(:) s
+377 118 M
+(               self.startingCookieCount = 0) s
+377 102 M
+(        self.form_vars = Directory\({}\)) s
+377 94 M
+(        self.form_vars.update\(default_vars\)) s
+377 86 M
+(        self.form_vars.update\(conf_vars\)) s
+377 78 M
+(        self.file_vars = Directory\({}\)) s
+377 70 M
+(        self.set_content_standard\(\)) s
+377 54 M
+(        self.__create_directories\(form\)) s
+377 38 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 38 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 38 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 38 M
+(__check_default_vars) s
+/F-gs-font 7 7 SF
+494.6 38 M
+(\(self, current_value, default_value\):) s
+377 30 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 30 M
+(if) s
+/F-gs-font 7 7 SF
+419 30 M
+( type\(current_value\) != {}:) s
+377 22 M
+(           ) s
+/Courier-Bold 7 7 SUF
+423.2 22 M
+(return) s
+/F-gs-font 7 7 SF
+448.4 22 M
+( default_value) s
+377 14 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 14 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 14 M
+( current_value) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 2 def
+/fname (WebForm.py) def
+/fdir () def
+/ftail (WebForm.py) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (01/03/01) def
+/modtimestr (18:47:25) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 518 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 518 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 518 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 518 M
+(__check_search_path) s
+/F-gs-font 7 7 SF
+118.4 518 M
+(\(self, current_value, default_value\):) s
+5 510 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 510 M
+(if) s
+/F-gs-font 7 7 SF
+47 510 M
+( type\(current_value\) != type\([]\):) s
+5 502 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 502 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 502 M
+( default_value) s
+5 494 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 494 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 494 M
+( current_value) s
+5 478 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 478 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 478 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 478 M
+(__check_content_type) s
+/F-gs-font 7 7 SF
+122.6 478 M
+(\(self, current_value, default_value\):) s
+5 470 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 470 M
+(if) s
+/F-gs-font 7 7 SF
+47 470 M
+( ) s
+/Courier-Bold 7 7 SUF
+51.2 470 M
+(not) s
+/F-gs-font 7 7 SF
+63.8 470 M
+( current_value ) s
+/Courier-Bold 7 7 SUF
+126.8 470 M
+(in) s
+/F-gs-font 7 7 SF
+135.2 470 M
+( [) s
+/Courier-Bold 7 7 SUF
+143.6 470 M
+('text/html') s
+/F-gs-font 7 7 SF
+189.8 470 M
+(, ) s
+/Courier-Bold 7 7 SUF
+198.2 470 M
+('text/plain') s
+/F-gs-font 7 7 SF
+248.6 470 M
+(, None]:) s
+5 462 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 462 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 462 M
+( default_value) s
+5 454 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 454 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 454 M
+( current_value) s
+5 446 M
+( ) s
+5 438 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 438 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 438 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 438 M
+(__check_use_cookies) s
+/F-gs-font 7 7 SF
+118.4 438 M
+(\(self, current_value, default_value\):) s
+5 430 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 430 M
+(if) s
+/F-gs-font 7 7 SF
+47 430 M
+( current_value ) s
+/Courier-Bold 7 7 SUF
+110 430 M
+(not) s
+/F-gs-font 7 7 SF
+122.6 430 M
+( ) s
+/Courier-Bold 7 7 SUF
+126.8 430 M
+(in) s
+/F-gs-font 7 7 SF
+135.2 430 M
+( [) s
+/Courier-Bold 7 7 SUF
+143.6 430 M
+('yes') s
+/F-gs-font 7 7 SF
+164.6 430 M
+(,) s
+/Courier-Bold 7 7 SUF
+168.8 430 M
+('no') s
+/F-gs-font 7 7 SF
+185.6 430 M
+(, None ]) s
+5 422 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 422 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 422 M
+( default_value) s
+5 414 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 414 M
+(else) s
+/F-gs-font 7 7 SF
+55.4 414 M
+(:) s
+5 406 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 406 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 406 M
+( current_value) s
+5 390 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 390 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 390 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 390 M
+(__check_emit_strategy) s
+/F-gs-font 7 7 SF
+126.8 390 M
+(\(self, current_value, default_value\):) s
+5 382 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 382 M
+(if) s
+/F-gs-font 7 7 SF
+47 382 M
+( isinstance\(current_value, Emitter.Emitter\):) s
+5 374 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 374 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 374 M
+( current_value) s
+5 366 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 366 M
+(elif) s
+/F-gs-font 7 7 SF
+55.4 366 M
+( type\(current_value\) == type\() s
+/Courier-Bold 7 7 SUF
+177.2 366 M
+('') s
+/F-gs-font 7 7 SF
+185.6 366 M
+(\) ) s
+/Courier-Bold 7 7 SUF
+194 366 M
+(and) s
+/F-gs-font 7 7 SF
+206.6 366 M
+( current_value ) s
+/Courier-Bold 7 7 SUF
+269.6 366 M
+(in) s
+/F-gs-font 7 7 SF
+278 366 M
+( [) s
+/Courier-Bold 7 7 SUF
+286.4 366 M
+('Emitter') s
+/F-gs-font 7 7 SF
+324.2 366 M
+(, ) s
+/Courier-Bold 7 7 SUF
+332.6 366 M
+('StringE) s
+5 358 M
+(mitter') s
+/F-gs-font 7 7 SF
+34.4 358 M
+(, ) s
+/Courier-Bold 7 7 SUF
+42.8 358 M
+('ListEmitter') s
+/F-gs-font 7 7 SF
+97.4 358 M
+(]:) s
+5 350 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 350 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 350 M
+( current_value) s
+5 342 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 342 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 342 M
+( default_value) s
+5 326 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 326 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 326 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 326 M
+(__check_stdout) s
+/F-gs-font 7 7 SF
+97.4 326 M
+(\(self, current_value, default_value\):) s
+5 318 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 318 M
+(if) s
+/F-gs-font 7 7 SF
+47 318 M
+( isinstance\(current_value, StringIO.StringIO\): ) s
+5 310 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 310 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 310 M
+( current_value) s
+5 302 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 302 M
+(elif) s
+/F-gs-font 7 7 SF
+55.4 302 M
+( current_value ) s
+/Courier-Bold 7 7 SUF
+118.4 302 M
+(in) s
+/F-gs-font 7 7 SF
+126.8 302 M
+( [sys.stderr]:) s
+5 294 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 294 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 294 M
+( current_value) s
+5 286 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 286 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 286 M
+( default_value) s
+5 278 M
+(           ) s
+5 262 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 262 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 262 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 262 M
+(__check_config_dir) s
+/F-gs-font 7 7 SF
+114.2 262 M
+(\(self, current_value, default_value\):) s
+5 254 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 254 M
+(if) s
+/F-gs-font 7 7 SF
+47 254 M
+( type\(current_value\) != type\() s
+/Courier-Bold 7 7 SUF
+168.8 254 M
+('') s
+/F-gs-font 7 7 SF
+177.2 254 M
+(\):) s
+5 246 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 246 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 246 M
+( default_value) s
+5 238 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 238 M
+(else) s
+/F-gs-font 7 7 SF
+55.4 238 M
+(:) s
+5 230 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 230 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 230 M
+( current_value) s
+5 214 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 214 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 214 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 214 M
+(__check_read_config_file) s
+/F-gs-font 7 7 SF
+139.4 214 M
+(\(self, current_value, default_value\):) s
+5 206 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 206 M
+(if) s
+/F-gs-font 7 7 SF
+47 206 M
+( current_value ) s
+/Courier-Bold 7 7 SUF
+110 206 M
+(in) s
+/F-gs-font 7 7 SF
+118.4 206 M
+( [) s
+/Courier-Bold 7 7 SUF
+126.8 206 M
+('yes') s
+/F-gs-font 7 7 SF
+147.8 206 M
+(,) s
+/Courier-Bold 7 7 SUF
+152 206 M
+('no') s
+/F-gs-font 7 7 SF
+168.8 206 M
+(]:) s
+5 198 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 198 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 198 M
+( current_value) s
+5 190 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 190 M
+(else) s
+/F-gs-font 7 7 SF
+55.4 190 M
+(:) s
+5 182 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 182 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 182 M
+( default_value) s
+5 166 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 166 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 166 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 166 M
+(__check_prefix) s
+/F-gs-font 7 7 SF
+97.4 166 M
+(\(self, current_value, default_value\):) s
+5 158 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 158 M
+(if) s
+/F-gs-font 7 7 SF
+47 158 M
+( type\(current_value\) == ) s
+/Courier-Bold 7 7 SUF
+147.8 158 M
+('') s
+/F-gs-font 7 7 SF
+156.2 158 M
+( ) s
+/Courier-Bold 7 7 SUF
+160.4 158 M
+(and) s
+/F-gs-font 7 7 SF
+173 158 M
+( current_value[-1] == ) s
+/Courier-Bold 7 7 SUF
+265.4 158 M
+('_') s
+/F-gs-font 7 7 SF
+278 158 M
+(:) s
+5 150 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 150 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 150 M
+( current_value) s
+5 142 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 142 M
+(elif) s
+/F-gs-font 7 7 SF
+55.4 142 M
+( current_value == None:) s
+5 134 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 134 M
+(return) s
+/F-gs-font 7 7 SF
+76.4 134 M
+( current_value) s
+5 126 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 126 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 126 M
+( default_value) s
+5 110 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 110 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 110 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 110 M
+(__create_directories) s
+/F-gs-font 7 7 SF
+122.6 110 M
+(\(self, form, depth=0\):) s
+5 102 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 102 M
+(for) s
+/F-gs-font 7 7 SF
+51.2 102 M
+( var ) s
+/Courier-Bold 7 7 SUF
+72.2 102 M
+(in) s
+/F-gs-font 7 7 SF
+80.6 102 M
+( form.keys\(\):) s
+5 94 M
+(            try:) s
+5 86 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 86 M
+(if) s
+/F-gs-font 7 7 SF
+76.4 86 M
+( type\(form[var]\) == type\([]\):) s
+5 78 M
+(                  form_var = form[var][0]) s
+5 70 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 70 M
+(else) s
+/F-gs-font 7 7 SF
+84.8 70 M
+(:) s
+5 62 M
+(                  form_var = form[var]) s
+5 46 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 46 M
+(if) s
+/F-gs-font 7 7 SF
+76.4 46 M
+( form_var.filename == None:) s
+5 38 M
+(                  self.form_vars[var] = form_var.value) s
+5 30 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 30 M
+(else) s
+/F-gs-font 7 7 SF
+84.8 30 M
+(:) s
+5 22 M
+(                  VAR_DIR = ) s
+/Courier-Bold 7 7 SUF
+122.6 22 M
+('/%s') s
+/F-gs-font 7 7 SF
+143.6 22 M
+( % var) s
+5 14 M
+(                  self.file_vars[var] = \(form_var.filename, form_var.file\)) s
+5 6 M
+(                  self.file_vars.create\(var\)) s
+377 518 M
+(                  self.file_vars.cd\(var\)) s
+377 510 M
+(                  self.file_vars[) s
+/Courier-Bold 7 7 SUF
+515.6 510 M
+('filename') s
+/F-gs-font 7 7 SF
+557.6 510 M
+(] = form_var.filename) s
+377 502 M
+(                  self.file_vars[) s
+/Courier-Bold 7 7 SUF
+515.6 502 M
+('file') s
+/F-gs-font 7 7 SF
+540.8 502 M
+(] = form_var.file) s
+377 494 M
+(                  self.file_vars.cd\() s
+/Courier-Bold 7 7 SUF
+528.2 494 M
+('/') s
+/F-gs-font 7 7 SF
+540.8 494 M
+(\)) s
+377 478 M
+(               ) s
+/Courier-Bold 7 7 SUF
+440 478 M
+(if) s
+/F-gs-font 7 7 SF
+448.4 478 M
+( type\(form[var]\) == type\([]\):) s
+377 470 M
+(                  VAR_DIR = ) s
+/Courier-Bold 7 7 SUF
+494.6 470 M
+('/%s') s
+/F-gs-font 7 7 SF
+515.6 470 M
+( % var) s
+377 462 M
+(                  self.form_vars.create\(var\)) s
+377 454 M
+(                  self.form_vars.cd\(var\)) s
+377 446 M
+(                  self.form_vars[var] = []) s
+377 438 M
+(                  varCount = 0) s
+377 430 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+452.6 430 M
+(for) s
+/F-gs-font 7 7 SF
+465.2 430 M
+( form_var ) s
+/Courier-Bold 7 7 SUF
+507.2 430 M
+(in) s
+/F-gs-font 7 7 SF
+515.6 430 M
+( form[var]:) s
+377 422 M
+(                     ) s
+/Courier-Bold 7 7 SUF
+465.2 422 M
+(if) s
+/F-gs-font 7 7 SF
+473.6 422 M
+( form_var.filename == None:) s
+377 414 M
+(                        self.form_vars[) s
+/Courier-Bold 7 7 SUF
+540.8 414 M
+("%s_%d") s
+/F-gs-font 7 7 SF
+570.2 414 M
+(%\(var,varCount\)] = form_var.value) s
+377 406 M
+(                        self.form_vars[var].append\(form_var.value\)) s
+377 398 M
+(                        varCount = varCount + 1) s
+377 390 M
+(                  self.form_vars.cd\() s
+/Courier-Bold 7 7 SUF
+528.2 390 M
+('/') s
+/F-gs-font 7 7 SF
+540.8 390 M
+(\)) s
+377 382 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 382 M
+(except) s
+/F-gs-font 7 7 SF
+452.6 382 M
+(:) s
+377 374 M
+(               ) s
+/Courier-Bold 7 7 SUF
+440 374 M
+(raise) s
+/F-gs-font 7 7 SF
+461 374 M
+( ) s
+/Courier-Bold 7 7 SUF
+465.2 374 M
+("WebFormException") s
+/F-gs-font 7 7 SF
+540.8 374 M
+(, str\(var\) + ) s
+/Courier-Bold 7 7 SUF
+595.4 374 M
+("=") s
+/F-gs-font 7 7 SF
+608 374 M
+( + str\(form[var]\)) s
+377 350 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 350 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 350 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 350 M
+(get_field_storage) s
+/F-gs-font 7 7 SF
+482 350 M
+(\(self\):) s
+377 342 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 342 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 342 M
+( self.form) s
+377 326 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 326 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 326 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 326 M
+(__parse_config_file) s
+/F-gs-font 7 7 SF
+490.4 326 M
+(\(self\):) s
+377 318 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 318 M
+(# Now load the configuration file for the form. Every form is required) s
+/F-gs-font 7 7 SF
+377 310 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 310 M
+(# to have one--no exceptions. This allows you to supply \(for example\)) s
+/F-gs-font 7 7 SF
+377 302 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 302 M
+(# default values for variables. The WebForm class will actually) s
+/F-gs-font 7 7 SF
+377 294 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 294 M
+(# register every variable appearing here as an actual attribute of) s
+/F-gs-font 7 7 SF
+377 286 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 286 M
+(# the WebForm subclass instance.) s
+/F-gs-font 7 7 SF
+377 278 M
+(        formDefaults = {}) s
+377 270 M
+(        ) s
+377 262 M
+(        try:) s
+377 254 M
+(            formId = self.__class__.__name__) s
+377 246 M
+(            configFile = self.config_dir + ) s
+/Courier-Bold 7 7 SUF
+557.6 246 M
+('/') s
+/F-gs-font 7 7 SF
+570.2 246 M
+( + formId + ) s
+/Courier-Bold 7 7 SUF
+620.6 246 M
+('.conf') s
+/F-gs-font 7 7 SF
+377 238 M
+(            confParser = ConfigParser.ConfigParser\(\)) s
+377 230 M
+(            confParser.read\( configFile \)) s
+377 222 M
+(            optionList = confParser.options\(formId\)) s
+377 206 M
+(            try:) s
+377 198 M
+(                optionList.remove\() s
+/Courier-Bold 7 7 SUF
+519.8 198 M
+('__name__') s
+/F-gs-font 7 7 SF
+561.8 198 M
+(\)) s
+377 190 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 190 M
+(except) s
+/F-gs-font 7 7 SF
+452.6 190 M
+(:) s
+377 182 M
+(                ) s
+/Courier-Bold 7 7 SUF
+444.2 182 M
+(pass) s
+/F-gs-font 7 7 SF
+377 174 M
+(            ) s
+377 166 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 166 M
+(for) s
+/F-gs-font 7 7 SF
+440 166 M
+( option ) s
+/Courier-Bold 7 7 SUF
+473.6 166 M
+(in) s
+/F-gs-font 7 7 SF
+482 166 M
+( optionList:) s
+377 158 M
+(                optionValue = confParser.get\(formId, option\)) s
+377 150 M
+(                formDefaults[option] = optionValue) s
+377 142 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 142 M
+(except) s
+/F-gs-font 7 7 SF
+435.8 142 M
+(:) s
+377 134 M
+(            ) s
+/Courier-Oblique 7 7 SUF
+427.4 134 M
+(# If any problem occurs in the ConfigParser, we are going to) s
+/F-gs-font 7 7 SF
+377 126 M
+(            ) s
+/Courier-Oblique 7 7 SUF
+427.4 126 M
+(# return whatever we were able to get.) s
+/F-gs-font 7 7 SF
+377 118 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 118 M
+(pass) s
+/F-gs-font 7 7 SF
+377 110 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 110 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 110 M
+( formDefaults) s
+377 94 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 94 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 94 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 94 M
+(__load_cookie) s
+/F-gs-font 7 7 SF
+465.2 94 M
+(\(self\):) s
+377 86 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 86 M
+(if) s
+/F-gs-font 7 7 SF
+419 86 M
+( os.environ.has_key\() s
+/Courier-Bold 7 7 SUF
+503 86 M
+("HTTP_COOKIE") s
+/F-gs-font 7 7 SF
+557.6 86 M
+(\):) s
+377 78 M
+(            cookie = SimpleCookie\(\)) s
+377 70 M
+(            cookie.load\(os.environ[) s
+/Courier-Bold 7 7 SUF
+524 70 M
+("HTTP_COOKIE") s
+/F-gs-font 7 7 SF
+578.6 70 M
+(]\)) s
+377 54 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 54 M
+(if) s
+/F-gs-font 7 7 SF
+435.8 54 M
+( len\(cookie.keys\(\)\):) s
+377 46 M
+(               ) s
+/Courier-Bold 7 7 SUF
+440 46 M
+(return) s
+/F-gs-font 7 7 SF
+465.2 46 M
+( cookie) s
+377 38 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 38 M
+(else) s
+/F-gs-font 7 7 SF
+444.2 38 M
+(:) s
+377 30 M
+(               ) s
+/Courier-Bold 7 7 SUF
+440 30 M
+(return) s
+/F-gs-font 7 7 SF
+465.2 30 M
+( None) s
+377 22 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 22 M
+(else) s
+/F-gs-font 7 7 SF
+427.4 22 M
+(:) s
+377 14 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 14 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 14 M
+( None) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 3 def
+/fname (WebForm.py) def
+/fdir () def
+/ftail (WebForm.py) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (01/03/01) def
+/modtimestr (18:47:25) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 510 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 510 M
+(# This method tells you whether any cookies are present int the form.) s
+/F-gs-font 7 7 SF
+5 494 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 494 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 494 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 494 M
+(has_cookies) s
+/F-gs-font 7 7 SF
+84.8 494 M
+(\(self\):) s
+5 486 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 486 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 486 M
+( len\(self.cookies\) > 0) s
+5 470 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 470 M
+(# This method returns the list of cookies to a client.) s
+/F-gs-font 7 7 SF
+5 454 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 454 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 454 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 454 M
+(get_cookies) s
+/F-gs-font 7 7 SF
+84.8 454 M
+(\(self\):) s
+5 446 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 446 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 446 M
+( self.cookies) s
+5 430 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 430 M
+(# This method allocates a cookie and links it onto the list of cookies.) s
+/F-gs-font 7 7 SF
+5 422 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 422 M
+(# It's basically a factory method.) s
+/F-gs-font 7 7 SF
+5 406 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 406 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 406 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 406 M
+(get_new_cookie) s
+/F-gs-font 7 7 SF
+97.4 406 M
+(\(self\):) s
+5 398 M
+(        cookie = SimpleCookie\(\)) s
+5 390 M
+(        self.cookies.append\(cookie\)) s
+5 382 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 382 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 382 M
+( cookie) s
+5 366 M
+(    ) s
+5 358 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 358 M
+(# This method will tell you whether any cookie can be found that matches) s
+/F-gs-font 7 7 SF
+5 350 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 350 M
+(# a list of vars. Matching occurs if all of the vars are found. An empty) s
+/F-gs-font 7 7 SF
+5 342 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 342 M
+(# To use this method, simply pass as many vars as you'd like to check.) s
+/F-gs-font 7 7 SF
+5 334 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 334 M
+(# e.g. matchCookie\('user','key'\) as in Jason's examples.) s
+/F-gs-font 7 7 SF
+5 318 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 318 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 318 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 318 M
+(match_one_cookie) s
+/F-gs-font 7 7 SF
+105.8 318 M
+(\(self,*vars\):) s
+5 310 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 310 M
+(if) s
+/F-gs-font 7 7 SF
+47 310 M
+( len\(vars\) < 1: ) s
+/Courier-Bold 7 7 SUF
+114.2 310 M
+(return) s
+/F-gs-font 7 7 SF
+139.4 310 M
+( None) s
+5 302 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 302 M
+(for) s
+/F-gs-font 7 7 SF
+51.2 302 M
+( cookie ) s
+/Courier-Bold 7 7 SUF
+84.8 302 M
+(in) s
+/F-gs-font 7 7 SF
+93.2 302 M
+( self.cookies:) s
+5 294 M
+(           matched = 1) s
+5 286 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 286 M
+(for) s
+/F-gs-font 7 7 SF
+63.8 286 M
+( var ) s
+/Courier-Bold 7 7 SUF
+84.8 286 M
+(in) s
+/F-gs-font 7 7 SF
+93.2 286 M
+( vars:) s
+5 278 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 278 M
+(if) s
+/F-gs-font 7 7 SF
+76.4 278 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 278 M
+(not) s
+/F-gs-font 7 7 SF
+93.2 278 M
+( cookie.has_key\(var\):) s
+5 270 M
+(                  matched = 0) s
+5 262 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+80.6 262 M
+(break) s
+/F-gs-font 7 7 SF
+5 254 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 254 M
+(if) s
+/F-gs-font 7 7 SF
+59.6 254 M
+( matched:) s
+5 246 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 246 M
+(return) s
+/F-gs-font 7 7 SF
+93.2 246 M
+( cookie) s
+5 238 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 238 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 238 M
+( None) s
+5 222 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 222 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 222 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 222 M
+(match_all_cookies) s
+/F-gs-font 7 7 SF
+110 222 M
+(\(self, *vars\):) s
+5 214 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 214 M
+(if) s
+/F-gs-font 7 7 SF
+47 214 M
+( len\(vars\) < 1: ) s
+/Courier-Bold 7 7 SUF
+114.2 214 M
+(return) s
+/F-gs-font 7 7 SF
+139.4 214 M
+( None) s
+5 206 M
+(        L=[]) s
+5 198 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 198 M
+(for) s
+/F-gs-font 7 7 SF
+51.2 198 M
+( cookie ) s
+/Courier-Bold 7 7 SUF
+84.8 198 M
+(in) s
+/F-gs-font 7 7 SF
+93.2 198 M
+( self.cookies:) s
+5 190 M
+(           matched = 1) s
+5 182 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 182 M
+(for) s
+/F-gs-font 7 7 SF
+63.8 182 M
+( var ) s
+/Courier-Bold 7 7 SUF
+84.8 182 M
+(in) s
+/F-gs-font 7 7 SF
+93.2 182 M
+( vars:) s
+5 174 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 174 M
+(if) s
+/F-gs-font 7 7 SF
+76.4 174 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 174 M
+(not) s
+/F-gs-font 7 7 SF
+93.2 174 M
+( cookie.has_key\(var\):) s
+5 166 M
+(                  matched = 0) s
+5 158 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+80.6 158 M
+(break) s
+/F-gs-font 7 7 SF
+5 150 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 150 M
+(if) s
+/F-gs-font 7 7 SF
+59.6 150 M
+( matched:) s
+5 142 M
+(               L.append\(cookie\)) s
+5 134 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 134 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 134 M
+( L) s
+5 118 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 118 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 118 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 118 M
+(set_content_type) s
+/F-gs-font 7 7 SF
+105.8 118 M
+(\(self,mimeTypeName\):) s
+5 110 M
+(        self.content_type = mimeTypeName) s
+5 94 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 94 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 94 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 94 M
+(set_content_standard) s
+/F-gs-font 7 7 SF
+122.6 94 M
+(\(self\):) s
+5 86 M
+(        self.set_content_type\() s
+/Courier-Bold 7 7 SUF
+131 86 M
+('text/html') s
+/F-gs-font 7 7 SF
+177.2 86 M
+(\)) s
+5 70 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 70 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 70 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 70 M
+(removeContentHeader) s
+/F-gs-font 7 7 SF
+118.4 70 M
+(\(self\):) s
+5 62 M
+(        self.content_type = None) s
+5 46 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 46 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 46 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 46 M
+(set_search_path) s
+/F-gs-font 7 7 SF
+101.6 46 M
+(\(self, search_path\):) s
+5 38 M
+(        self.search_path = search_path) s
+5 22 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 22 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 22 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 22 M
+(__bind_vars) s
+/F-gs-font 7 7 SF
+84.8 22 M
+(\(self\):) s
+5 14 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 14 M
+(""") s
+5 6 M
+(        Set attributes from self.form_vars in this object.) s
+377 518 M
+(        """) s
+/F-gs-font 7 7 SF
+377 510 M
+(        prefix = self.prefix) s
+377 502 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 502 M
+(for) s
+/F-gs-font 7 7 SF
+423.2 502 M
+( var ) s
+/Courier-Bold 7 7 SUF
+444.2 502 M
+(in) s
+/F-gs-font 7 7 SF
+452.6 502 M
+( self.form_vars.keys\(\):) s
+377 494 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 494 M
+(if) s
+/F-gs-font 7 7 SF
+435.8 494 M
+( ) s
+/Courier-Bold 7 7 SUF
+440 494 M
+(not) s
+/F-gs-font 7 7 SF
+452.6 494 M
+( self.__dict__.has_key\(prefix + var\):) s
+377 486 M
+(                setattr\(self,prefix + var,self.form_vars[var]\)) s
+377 470 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 470 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 470 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 470 M
+(__flush_vars) s
+/F-gs-font 7 7 SF
+461 470 M
+(\(self\):) s
+377 462 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 462 M
+(""") s
+377 454 M
+(        Take any variables beginning with the bind prefix and write them) s
+377 446 M
+(        out to the form variables.) s
+377 438 M
+(        """) s
+/F-gs-font 7 7 SF
+377 430 M
+(        prefix = self.prefix) s
+377 422 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 422 M
+(for) s
+/F-gs-font 7 7 SF
+423.2 422 M
+( var ) s
+/Courier-Bold 7 7 SUF
+444.2 422 M
+(in) s
+/F-gs-font 7 7 SF
+452.6 422 M
+( self.form_vars.keys\(\):) s
+377 414 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 414 M
+(if) s
+/F-gs-font 7 7 SF
+435.8 414 M
+( self.__dict__.has_key\(prefix + var\):) s
+377 406 M
+(                self.form_vars[var] = getattr\(self,prefix + var\)) s
+377 390 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 390 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 390 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 390 M
+(add_vars) s
+/F-gs-font 7 7 SF
+444.2 390 M
+(\(self, env\):) s
+377 382 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 382 M
+(""") s
+377 374 M
+(        Add a dictionary of variables to self.form_vars.) s
+377 366 M
+(        """) s
+/F-gs-font 7 7 SF
+377 350 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 350 M
+(for) s
+/F-gs-font 7 7 SF
+423.2 350 M
+( var ) s
+/Courier-Bold 7 7 SUF
+444.2 350 M
+(in) s
+/F-gs-font 7 7 SF
+452.6 350 M
+( env.keys\(\):) s
+377 342 M
+(            self.form_vars[var] = env[var]) s
+377 326 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 326 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 326 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 326 M
+(add_var) s
+/F-gs-font 7 7 SF
+440 326 M
+(\(self, name, value\):) s
+377 318 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 318 M
+(""") s
+377 310 M
+(        Add a single binding between 'name' and 'value' to self.form_vars.) s
+377 302 M
+(        """) s
+/F-gs-font 7 7 SF
+377 294 M
+(        ) s
+377 286 M
+(        self.form_vars[name] = value) s
+377 270 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 270 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 270 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 270 M
+(get_file_name) s
+/F-gs-font 7 7 SF
+465.2 270 M
+(\(self, var\):) s
+377 262 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 262 M
+(""") s
+377 254 M
+(        Uploaded files get entries written in to the self.file_vars directory.) s
+377 246 M
+(        Given 'var', go to its directory and get the 'filename' attribute,) s
+377 238 M
+(        which returns the file name of the uploaded file as supplied by the) s
+377 230 M
+(        user.) s
+377 222 M
+(        """) s
+/F-gs-font 7 7 SF
+377 214 M
+(        try:) s
+377 206 M
+(            VAR_DIR = ) s
+/Courier-Bold 7 7 SUF
+469.4 206 M
+('/%s') s
+/F-gs-font 7 7 SF
+490.4 206 M
+( % var) s
+377 198 M
+(            self.file_vars.cd\(var\)) s
+377 190 M
+(            fileName = self.file_vars[) s
+/Courier-Bold 7 7 SUF
+536.6 190 M
+('filename') s
+/F-gs-font 7 7 SF
+578.6 190 M
+(]) s
+377 182 M
+(            self.file_vars.cd\() s
+/Courier-Bold 7 7 SUF
+503 182 M
+('/') s
+/F-gs-font 7 7 SF
+515.6 182 M
+(\)) s
+377 174 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 174 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 174 M
+( fileName) s
+377 166 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 166 M
+(except) s
+/F-gs-font 7 7 SF
+435.8 166 M
+(:) s
+377 158 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 158 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 158 M
+( None) s
+377 150 M
+(        ) s
+377 142 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 142 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 142 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 142 M
+(get_file_handle) s
+/F-gs-font 7 7 SF
+473.6 142 M
+(\(self, var\):) s
+377 134 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 134 M
+(""") s
+377 126 M
+(        Using this method gets the file handle of the file uploaded by the ) s
+377 118 M
+(        user so it can be read.) s
+377 110 M
+(        """) s
+/F-gs-font 7 7 SF
+377 102 M
+(        try:) s
+377 94 M
+(            VAR_DIR = ) s
+/Courier-Bold 7 7 SUF
+469.4 94 M
+('/%s') s
+/F-gs-font 7 7 SF
+490.4 94 M
+( % var) s
+377 86 M
+(            self.file_vars.cd\(var\)) s
+377 78 M
+(            fileHandle = self.file_vars[) s
+/Courier-Bold 7 7 SUF
+545 78 M
+('file') s
+/F-gs-font 7 7 SF
+570.2 78 M
+(]) s
+377 70 M
+(            self.file_vars.cd\() s
+/Courier-Bold 7 7 SUF
+503 70 M
+('/') s
+/F-gs-font 7 7 SF
+515.6 70 M
+(\)) s
+377 62 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 62 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 62 M
+( fileHandle) s
+377 54 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 54 M
+(except) s
+/F-gs-font 7 7 SF
+435.8 54 M
+(:) s
+377 46 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 46 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 46 M
+( None) s
+377 38 M
+(        ) s
+377 30 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 30 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 30 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 30 M
+(process) s
+/F-gs-font 7 7 SF
+440 30 M
+(\(self\):) s
+377 22 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 22 M
+(""") s
+377 14 M
+(        Abstract method) s
+377 6 M
+(        """) s
+/F-gs-font 7 7 SF
+_R
+S
+%%Page: (4) 4
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 4 def
+/fname (WebForm.py) def
+/fdir () def
+/ftail (WebForm.py) def
+% User defined strings:
+/pagenumstr (4) def
+/moddatestr (01/03/01) def
+/modtimestr (18:47:25) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 518 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 518 M
+(raise) s
+/F-gs-font 7 7 SF
+59.6 518 M
+( ) s
+/Courier-Bold 7 7 SUF
+63.8 518 M
+("WebForm requires subclass to implement the process\(\) method") s
+/F-gs-font 7 7 SF
+5 502 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 502 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 502 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 502 M
+(set_encode_file_name) s
+/F-gs-font 7 7 SF
+122.6 502 M
+(\(self, fileName\):) s
+5 494 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 494 M
+(""") s
+5 486 M
+(        Set the filename to be encoded via the encode\(\) method. This filename) s
+5 478 M
+(        should correspond to a text file, possibly containing WriteProcessor) s
+5 470 M
+(        variables.) s
+5 462 M
+(        """) s
+/F-gs-font 7 7 SF
+5 454 M
+(        ) s
+5 446 M
+(        self.encode_target = fileName) s
+5 430 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 430 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 430 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 430 M
+(encode) s
+/F-gs-font 7 7 SF
+63.8 430 M
+(\(self, prepend_text=) s
+/Courier-Bold 7 7 SUF
+147.8 430 M
+('') s
+/F-gs-font 7 7 SF
+156.2 430 M
+(\):) s
+5 422 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 422 M
+(""") s
+5 414 M
+(        Process the form. ) s
+5 406 M
+(        """) s
+/F-gs-font 7 7 SF
+5 398 M
+(        ) s
+5 390 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 390 M
+(# self.emit_strategy is a property to construct WebForm. It is) s
+/F-gs-font 7 7 SF
+5 382 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 382 M
+(# either a string or an Emitter instance. If it's a string, this) s
+/F-gs-font 7 7 SF
+5 374 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 374 M
+(# string must be one of the valid Emitter class names.) s
+/F-gs-font 7 7 SF
+5 358 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 358 M
+(if) s
+/F-gs-font 7 7 SF
+47 358 M
+( type\(self.emit_strategy\) == type\() s
+/Courier-Bold 7 7 SUF
+189.8 358 M
+('') s
+/F-gs-font 7 7 SF
+198.2 358 M
+(\):) s
+5 350 M
+(            emitter = Emitter.createEmitter\(self.emit_strategy\)) s
+5 334 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 334 M
+(# On error, raise an exception. This is only likely to happen if) s
+/F-gs-font 7 7 SF
+5 326 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 326 M
+(# WebForm is not constructed with emit_strategy set to an appropriate) s
+/F-gs-font 7 7 SF
+5 318 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 318 M
+(# Emitter object.) s
+/F-gs-font 7 7 SF
+5 302 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 302 M
+(if) s
+/F-gs-font 7 7 SF
+47 302 M
+( ) s
+/Courier-Bold 7 7 SUF
+51.2 302 M
+(not) s
+/F-gs-font 7 7 SF
+63.8 302 M
+( isinstance\(self.emit_strategy, Emitter.Emitter\):) s
+5 294 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 294 M
+(raise) s
+/F-gs-font 7 7 SF
+76.4 294 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 294 M
+('Invalid strategy passed to WebForm') s
+/F-gs-font 7 7 SF
+5 278 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 278 M
+(# Copy the environment. This might no longer be necessary. Need to) s
+/F-gs-font 7 7 SF
+5 270 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 270 M
+(# check the WriteProcessor code.) s
+/F-gs-font 7 7 SF
+5 254 M
+(        newEnv = self.form_vars.copy\(\)) s
+5 238 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 238 M
+(# If 'use_cookies' was enabled, emit the cookies. Otherwise, toss) s
+/F-gs-font 7 7 SF
+5 230 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 230 M
+(# the cookies. \(Just had to say that.\)) s
+/F-gs-font 7 7 SF
+5 222 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 222 M
+(if) s
+/F-gs-font 7 7 SF
+47 222 M
+( self.use_cookies == ) s
+/Courier-Bold 7 7 SUF
+135.2 222 M
+('yes') s
+/F-gs-font 7 7 SF
+156.2 222 M
+(:) s
+5 214 M
+(           ) s
+/Courier-Bold 7 7 SUF
+51.2 214 M
+(for) s
+/F-gs-font 7 7 SF
+63.8 214 M
+( cookie ) s
+/Courier-Bold 7 7 SUF
+97.4 214 M
+(in) s
+/F-gs-font 7 7 SF
+105.8 214 M
+( self.cookies[self.startingCookieCount:]:) s
+5 206 M
+(              emitter.emit\(`cookie` + ) s
+/Courier-Bold 7 7 SUF
+164.6 206 M
+('\\n') s
+/F-gs-font 7 7 SF
+181.4 206 M
+(\)) s
+5 190 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 190 M
+(# If 'content_type' is not None, emit the content type header.) s
+/F-gs-font 7 7 SF
+5 182 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 182 M
+(if) s
+/F-gs-font 7 7 SF
+47 182 M
+( self.content_type != None:) s
+5 174 M
+(           emitter.emit\() s
+/Courier-Bold 7 7 SUF
+105.8 174 M
+('Content-Type: ') s
+/F-gs-font 7 7 SF
+173 174 M
+( + self.content_type + ) s
+/Courier-Bold 7 7 SUF
+269.6 174 M
+('\\n\\n') s
+/F-gs-font 7 7 SF
+294.8 174 M
+(\)) s
+5 166 M
+(     ) s
+5 158 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 158 M
+(# If any initial text was passed, emit it. By default, 'prepend_text') s
+/F-gs-font 7 7 SF
+5 150 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 150 M
+(# is set to the empty string, meaning nothing is to be prepended.) s
+/F-gs-font 7 7 SF
+5 142 M
+(        emitter.emit\(prepend_text\)) s
+5 126 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 126 M
+(# Now, call the WriteProcessor. In order for this to work, a valid) s
+/F-gs-font 7 7 SF
+5 118 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 118 M
+(# 'encode_target' must have been passed to WebForm \(or via the) s
+/F-gs-font 7 7 SF
+5 110 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 110 M
+(# set_encode_target\(\) method call.) s
+/F-gs-font 7 7 SF
+5 102 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 102 M
+(if) s
+/F-gs-font 7 7 SF
+47 102 M
+( self.encode_target != None:) s
+5 94 M
+(            wpc = WriteProcessor.WriteProcesor) s
+5 86 M
+(            wp = wpc\(self.encode_target, self.search_path, newEnv, emitter\)) s
+5 78 M
+(            wp.process\(\)) s
+5 62 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 62 M
+(# Finally, return the result.) s
+/F-gs-font 7 7 SF
+5 46 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 46 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 46 M
+( emitter.getResult\(\)) s
+5 22 M
+(errorText = ) s
+/Courier-Bold 7 7 SUF
+55.4 22 M
+(""") s
+5 14 M
+(<html>) s
+5 6 M
+(  <head>) s
+377 518 M
+(    <title>WebForm Processing Error</title>) s
+377 510 M
+(  </head>) s
+377 494 M
+(  <body>) s
+377 486 M
+(    <h1>WebForm Error in Processing</h1>) s
+377 478 M
+(     <p>An error has been encountered in processing a form.</p>) s
+377 470 M
+(     <p><<WebForm_Error>></p>) s
+377 462 M
+(  </body>) s
+377 454 M
+(</html>) s
+377 446 M
+(""") s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+377 430 M
+(def) s
+/F-gs-font 7 7 SF
+389.6 430 M
+( ) s
+/Courier-Bold 7 7 SUF
+393.8 430 M
+(error) s
+/F-gs-font 7 7 SF
+414.8 430 M
+(\(form, message, emitContentHeader=1\):) s
+377 422 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 422 M
+(""") s
+377 414 M
+(    documentation type="function">) s
+377 406 M
+(    <synopsis>) s
+377 398 M
+(    This is used to guarantee that any error that occurs when dispatching a) s
+377 390 M
+(    form results in valid HTML being generated. It also guarantees that a) s
+377 382 M
+(    meaningful message will also be displayed.) s
+377 374 M
+(    </synopis>) s
+377 366 M
+(    <param name="form">) s
+377 358 M
+(    The cgi.FieldStorage\(\) object containing all form variables.) s
+377 350 M
+(    </param>) s
+377 342 M
+(    <param name="message">) s
+377 334 M
+(    A human-comprehensible message that describes what happened) s
+377 326 M
+(    and \(in the future\) how to resolve the problem.) s
+377 318 M
+(    </param>) s
+377 310 M
+(    </documentation>) s
+377 302 M
+(    """) s
+/F-gs-font 7 7 SF
+377 294 M
+(    ) s
+377 286 M
+(    env = {}) s
+377 278 M
+(    env[) s
+/Courier-Bold 7 7 SUF
+410.6 278 M
+('WebForm_Error') s
+/F-gs-font 7 7 SF
+473.6 278 M
+(] = message) s
+377 262 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 262 M
+(if) s
+/F-gs-font 7 7 SF
+402.2 262 M
+( emitContentHeader:) s
+377 254 M
+(       ) s
+/Courier-Bold 7 7 SUF
+406.4 254 M
+(print) s
+/F-gs-font 7 7 SF
+427.4 254 M
+( ) s
+/Courier-Bold 7 7 SUF
+431.6 254 M
+('Content-type: text/html\\n\\n') s
+/F-gs-font 7 7 SF
+377 246 M
+(    wp = SimpleWriter.SimpleWriter\(\)) s
+377 238 M
+(    wp.compile\(errorText\)) s
+377 230 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 230 M
+(print) s
+/F-gs-font 7 7 SF
+414.8 230 M
+( wp.evaluate\(env\)) s
+/Courier-Bold 7 7 SUF
+377 214 M
+(def) s
+/F-gs-font 7 7 SF
+389.6 214 M
+( ) s
+/Courier-Bold 7 7 SUF
+393.8 214 M
+(getWebFormDispatcher) s
+/F-gs-font 7 7 SF
+477.8 214 M
+(\(args,htmlSearchPath\):) s
+377 206 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 206 M
+(""") s
+377 198 M
+(    <documentation type="function">) s
+377 190 M
+(    <synopsis>) s
+377 182 M
+(    To use the WebForm system, your main method need only contain a call to) s
+377 174 M
+(    skeleton dispatcher with the command line arguments.) s
+377 166 M
+(    </synopsis>) s
+377 158 M
+(    </documentation>) s
+377 150 M
+(    """) s
+/F-gs-font 7 7 SF
+377 134 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 134 M
+(# args[0] always contains the name of the program. This should be) s
+/F-gs-font 7 7 SF
+377 126 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 126 M
+(# the name of your form. Basically, each class must be contained in) s
+/F-gs-font 7 7 SF
+377 118 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 118 M
+(# a file that matches the class name. So if your WebForm subclass is) s
+/F-gs-font 7 7 SF
+377 110 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 110 M
+(# 'class OrderPizza\(WebForm\)', it should be in a file named OrderPizza*.) s
+/F-gs-font 7 7 SF
+377 102 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 102 M
+(#) s
+/F-gs-font 7 7 SF
+377 94 M
+(    ) s
+377 86 M
+(    programName = args[0]) s
+377 70 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 70 M
+(# Allow for the \(real\) possibility that the program name might be) s
+/F-gs-font 7 7 SF
+377 62 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 62 M
+(# invoked as a full path or whatever. This would probably break if) s
+/F-gs-font 7 7 SF
+377 54 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 54 M
+(# we ran on Apache Winhose, but since Hostway would never do such) s
+/F-gs-font 7 7 SF
+377 46 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 46 M
+(# a cheesy thing on the server side, I am not going to worry about) s
+/F-gs-font 7 7 SF
+377 38 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 38 M
+(# this hypothetical possibility that "/" isn't the separator.) s
+/F-gs-font 7 7 SF
+377 30 M
+(    ) s
+377 22 M
+(    pathParts = string.split\(programName,) s
+/Courier-Bold 7 7 SUF
+549.2 22 M
+("/") s
+/F-gs-font 7 7 SF
+561.8 22 M
+(\)) s
+377 6 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 6 M
+(# The last token after "/" is the complete file name.) s
+_R
+S
+%%Page: (5) 5
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 5 def
+/fname (WebForm.py) def
+/fdir () def
+/ftail (WebForm.py) def
+/Courier-Oblique 7 7 SUF
+% User defined strings:
+/pagenumstr (5) def
+/moddatestr (01/03/01) def
+/modtimestr (18:47:25) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+/F-gs-font 7 7 SF
+5 518 M
+(    realName = pathParts[-1]) s
+5 510 M
+(    ) s
+5 502 M
+(    mainNameParts = string.split\(realName,) s
+/Courier-Bold 7 7 SUF
+181.4 502 M
+(".") s
+/F-gs-font 7 7 SF
+194 502 M
+(\)) s
+5 494 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 494 M
+(# Get rid of the .py or .whatever.) s
+/F-gs-font 7 7 SF
+5 486 M
+(    className = mainNameParts[0]) s
+5 470 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 470 M
+(# Run, Forrest, Run!) s
+/F-gs-font 7 7 SF
+5 462 M
+(    WebFormDispatcher\(htmlSearchPath, className, className\)) s
+/Courier-Bold 7 7 SUF
+5 438 M
+(class) s
+/F-gs-font 7 7 SF
+26 438 M
+( WebFormDispatcher:) s
+5 430 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 430 M
+(""") s
+5 422 M
+(    <documentation type="class">) s
+5 414 M
+(    <synopsis>) s
+5 406 M
+(    A singleton class \(i.e. only one instance should be created\) that) s
+5 398 M
+(    is used to dynamically dispatch and execute user defined WebForm) s
+5 390 M
+(    objects. This class dynamically executes code to import a user-defined) s
+5 382 M
+(    class \(from a module having the same name\). The instance is created and) s
+5 374 M
+(    then processed \(using the <xref class="WebForm" method="process"/>\) and) s
+5 366 M
+(    encoded \(the part that renders the next HTML form, using) s
+5 358 M
+(    the <xref class="WebForm" method="encode"/> method.) s
+5 350 M
+(    </synopsis>) s
+5 342 M
+(    </documentation>) s
+5 334 M
+(    """) s
+/F-gs-font 7 7 SF
+5 326 M
+(    ) s
+5 318 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 318 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 318 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 318 M
+(__init__) s
+/F-gs-font 7 7 SF
+72.2 318 M
+(\(self,search_path,formId=None,content_type=) s
+/Courier-Bold 7 7 SUF
+252.8 318 M
+("text/html") s
+/F-gs-font 7 7 SF
+299 318 M
+(\):) s
+5 310 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 310 M
+(""") s
+5 302 M
+(        <documentation type="class">) s
+5 294 M
+(        <synopsis>) s
+5 286 M
+(        All of the work is done in the constructor, since this class is) s
+5 278 M
+(        intended for use as a singleton. That is, an instance is created,) s
+5 270 M
+(        it does its thing, and then it is not used further. A CGI script) s
+5 262 M
+(        simply creates this instance in its main method \(or as its only) s
+5 254 M
+(        statement\) and that is all there is to it. See the examples for) s
+5 246 M
+(        how to automate the setup of this class. It is very slick, and very) s
+5 238 M
+(        easy.) s
+5 230 M
+(        </synopsis>) s
+5 222 M
+(        <param name="search_path">) s
+5 214 M
+(        where to find included \(HTML\) files/fragments) s
+5 206 M
+(        </param>) s
+5 198 M
+(        <param name="formId">) s
+5 190 M
+(        the form to be loaded. Typically, this will simply be the 'name') s
+5 182 M
+(        of the program, which is sys.args[0].) s
+5 174 M
+(        </param>) s
+5 166 M
+(        <param name="content_type">) s
+5 158 M
+(        Generally, leave this alone. We'll need to think a little bit about) s
+5 150 M
+(        how to get out of the box to generate something non-HTML, such as a) s
+5 142 M
+(        ZIP file or whatever. This should not be a problem to extend. It) s
+5 134 M
+(        will probably require us to change some things in the WebForm class.) s
+5 126 M
+(        </param>) s
+5 118 M
+(        </documentation>) s
+5 110 M
+(        """) s
+/F-gs-font 7 7 SF
+5 94 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 94 M
+(# First get all of the data that was defined in the form. The CGI) s
+/F-gs-font 7 7 SF
+5 86 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 86 M
+(# module of Python does this, albeit in a crappy way, since it does) s
+/F-gs-font 7 7 SF
+5 78 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 78 M
+(# not pass the values of 'inputs' that were left blank, for example.) s
+/F-gs-font 7 7 SF
+5 70 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 70 M
+(#) s
+/F-gs-font 7 7 SF
+5 62 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 62 M
+(# We need to peek at the variables to determine what form is to) s
+/F-gs-font 7 7 SF
+5 54 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 54 M
+(# be loaded. The 'input' named WebForm_FormId is reserved for this) s
+/F-gs-font 7 7 SF
+5 46 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 46 M
+(# purpose.) s
+/F-gs-font 7 7 SF
+5 38 M
+(        ) s
+5 30 M
+(        form = cgi.FieldStorage\(\)) s
+5 14 M
+(        try:) s
+5 6 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 6 M
+(if) s
+/F-gs-font 7 7 SF
+63.8 6 M
+( ) s
+/Courier-Bold 7 7 SUF
+68 6 M
+(not) s
+/F-gs-font 7 7 SF
+80.6 6 M
+( formId:) s
+377 518 M
+(                formId = form[) s
+/Courier-Bold 7 7 SUF
+503 518 M
+('WebForm_FormId') s
+/F-gs-font 7 7 SF
+570.2 518 M
+(].value) s
+377 510 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 510 M
+(except) s
+/F-gs-font 7 7 SF
+435.8 510 M
+(:) s
+377 502 M
+(            error\(form,) s
+/Courier-Bold 7 7 SUF
+473.6 502 M
+("Hidden 'WebForm_FormId' variable not defined") s
+/F-gs-font 7 7 SF
+666.8 502 M
+(\)) s
+377 494 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 494 M
+(return) s
+/F-gs-font 7 7 SF
+377 478 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 478 M
+(# This could be deleted but some existing apps could break. I have) s
+/F-gs-font 7 7 SF
+377 470 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 470 M
+(# decided to put the .conf logic into the WebForm class itself.) s
+/F-gs-font 7 7 SF
+377 462 M
+(        ) s
+377 454 M
+(        formDefaults = {}) s
+377 438 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 438 M
+(# Import the module \(form\) dynamically. We will swtich to __import__) s
+/F-gs-font 7 7 SF
+377 430 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 430 M
+(# soon, since it has the convenient property of giving a namespace) s
+/F-gs-font 7 7 SF
+377 422 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 422 M
+(# reference.) s
+/F-gs-font 7 7 SF
+377 406 M
+(        __namespace__ = __import__\(formId\)) s
+377 390 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 390 M
+(# Dynamically create the form instance. At the end of this, __form__) s
+/F-gs-font 7 7 SF
+377 382 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 382 M
+(# is a reference to the form object.) s
+/F-gs-font 7 7 SF
+377 374 M
+(        ) s
+377 366 M
+(        statement = ) s
+/Courier-Bold 7 7 SUF
+461 366 M
+('_form_ = __namespace__.') s
+/F-gs-font 7 7 SF
+566 366 M
+( + formId) s
+377 358 M
+(        statement = statement + ) s
+/Courier-Bold 7 7 SUF
+511.4 358 M
+('\(form,formDefaults,search_path\)') s
+/F-gs-font 7 7 SF
+377 350 M
+(        try:) s
+377 342 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 342 M
+(exec) s
+/F-gs-font 7 7 SF
+444.2 342 M
+( statement) s
+377 334 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 334 M
+(except) s
+/F-gs-font 7 7 SF
+435.8 334 M
+(:) s
+377 326 M
+(            error\(form,) s
+/Courier-Bold 7 7 SUF
+473.6 326 M
+("could not execute ") s
+/F-gs-font 7 7 SF
+557.6 326 M
+( + statement\)) s
+377 318 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 318 M
+(print) s
+/F-gs-font 7 7 SF
+448.4 318 M
+( ) s
+/Courier-Bold 7 7 SUF
+452.6 318 M
+("<pre>") s
+/F-gs-font 7 7 SF
+377 310 M
+(            traceback.print_exc\(None,sys.stdout\)) s
+377 302 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 302 M
+(print) s
+/F-gs-font 7 7 SF
+448.4 302 M
+( ) s
+/Courier-Bold 7 7 SUF
+452.6 302 M
+("</pre>") s
+/F-gs-font 7 7 SF
+377 294 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 294 M
+(return) s
+/F-gs-font 7 7 SF
+377 278 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 278 M
+(# Set \(by default\) the template for generating HTML output code to) s
+/F-gs-font 7 7 SF
+377 270 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 270 M
+(# be the same name as the form followed by '.html'. This can be) s
+/F-gs-font 7 7 SF
+377 262 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 262 M
+(# changed by the form's process\(\) method.) s
+/F-gs-font 7 7 SF
+377 254 M
+(        ) s
+377 246 M
+(        _form_.set_encode_file_name\(formId + ) s
+/Courier-Bold 7 7 SUF
+566 246 M
+('.html') s
+/F-gs-font 7 7 SF
+595.4 246 M
+(\)) s
+377 230 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 230 M
+(#) s
+/F-gs-font 7 7 SF
+377 222 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 222 M
+(# Call the form's business logic \(process\) method. This method \(as) s
+/F-gs-font 7 7 SF
+377 214 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 214 M
+(# mentioned in the WebForm documentation\) is to be overridden to) s
+/F-gs-font 7 7 SF
+377 206 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 206 M
+(# actually get your business logic wired in.) s
+/F-gs-font 7 7 SF
+377 198 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 198 M
+(#) s
+/F-gs-font 7 7 SF
+377 190 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 190 M
+(#) s
+/F-gs-font 7 7 SF
+377 182 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 182 M
+(# If an exception occurs during this process, it is sent to the) s
+/F-gs-font 7 7 SF
+377 174 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 174 M
+(# standard output \(which, coincidentally is dup'd to the output) s
+/F-gs-font 7 7 SF
+377 166 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 166 M
+(# stream associated with the socket held by the HTTP server. This) s
+/F-gs-font 7 7 SF
+377 158 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 158 M
+(# means \(happily\) that any run time error a la Python is going to) s
+/F-gs-font 7 7 SF
+377 150 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 150 M
+(# be seen in the browser window) s
+/F-gs-font 7 7 SF
+377 142 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 142 M
+(#) s
+/F-gs-font 7 7 SF
+377 134 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 134 M
+(# GKT Note: We want to do two things here.) s
+/F-gs-font 7 7 SF
+377 126 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 126 M
+(# 1. Provide the option for printing a generic message and showing) s
+/F-gs-font 7 7 SF
+377 118 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 118 M
+(#    no traceback \(useful during deployment--don't want customers) s
+/F-gs-font 7 7 SF
+377 110 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 110 M
+(#    to see tracebacks for sure!\)) s
+/F-gs-font 7 7 SF
+377 102 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 102 M
+(# 2. Support integration with the hwMail package and logging server) s
+/F-gs-font 7 7 SF
+377 94 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 94 M
+(#    that we are \(or hope to be\) working on. Flat file logging would) s
+/F-gs-font 7 7 SF
+377 86 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 86 M
+(#    also be VERY nice.) s
+/F-gs-font 7 7 SF
+377 78 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 78 M
+(#) s
+/F-gs-font 7 7 SF
+377 70 M
+(        ) s
+377 62 M
+(        try:) s
+377 54 M
+(            stdout = sys.stdout) s
+377 46 M
+(            sys.stdout = out = StringIO.StringIO\(\)) s
+377 38 M
+(            _form_.process\(\)) s
+377 30 M
+(            sys.stdout = stdout) s
+377 22 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 22 M
+(except) s
+/F-gs-font 7 7 SF
+435.8 22 M
+(:) s
+377 14 M
+(            sys.stdout = stdout) s
+377 6 M
+(            error\(form,) s
+/Courier-Bold 7 7 SUF
+473.6 6 M
+("Exception encountered in business logic [process\(\)]") s
+/F-gs-font 7 7 SF
+696.2 6 M
+(\)) s
+_R
+S
+%%Page: (6) 6
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 6 def
+/fname (WebForm.py) def
+/fdir () def
+/ftail (WebForm.py) def
+% User defined strings:
+/pagenumstr (6) def
+/moddatestr (01/03/01) def
+/modtimestr (18:47:25) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 518 M
+(            outText = out.getvalue\(\)) s
+5 510 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 510 M
+(print) s
+/F-gs-font 7 7 SF
+76.4 510 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 510 M
+("<pre>") s
+/F-gs-font 7 7 SF
+5 502 M
+(            traceback.print_exc\(None,sys.stdout\)) s
+5 494 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 494 M
+(print) s
+/F-gs-font 7 7 SF
+76.4 494 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 494 M
+("</pre>") s
+/F-gs-font 7 7 SF
+5 486 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 486 M
+(print) s
+/F-gs-font 7 7 SF
+76.4 486 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 486 M
+("<h1> output intercepted from process\(\) method </h1>") s
+/F-gs-font 7 7 SF
+5 478 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 478 M
+(if) s
+/F-gs-font 7 7 SF
+63.8 478 M
+( len\(outText\) > 0:) s
+5 470 M
+(               ) s
+/Courier-Bold 7 7 SUF
+68 470 M
+(print) s
+/F-gs-font 7 7 SF
+89 470 M
+( outText) s
+5 462 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 462 M
+(return) s
+/F-gs-font 7 7 SF
+5 446 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 446 M
+(#) s
+/F-gs-font 7 7 SF
+5 438 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 438 M
+(# Final Code Generation. It is unlikely an exception will be thrown) s
+/F-gs-font 7 7 SF
+5 430 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 430 M
+(# in here. If one does happen, it is impossible to guarantee that the) s
+/F-gs-font 7 7 SF
+5 422 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 422 M
+(# exception is propagated to the browser. Assuming that the cookies) s
+/F-gs-font 7 7 SF
+5 414 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 414 M
+(# being emitted are well formed \(a pretty reasonable assumption\), the) s
+/F-gs-font 7 7 SF
+5 406 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 406 M
+(# exception should be processed normally.) s
+/F-gs-font 7 7 SF
+5 398 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 398 M
+(#) s
+/F-gs-font 7 7 SF
+5 390 M
+(        try:) s
+5 382 M
+(            outText = out.getvalue\(\)) s
+5 374 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 374 M
+(if) s
+/F-gs-font 7 7 SF
+63.8 374 M
+( len\(outText\) > 0:) s
+5 366 M
+(               _form_.encode\(text=outText\)) s
+5 358 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 358 M
+(else) s
+/F-gs-font 7 7 SF
+72.2 358 M
+(:) s
+5 350 M
+(               _form_.encode\(\)) s
+5 342 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 342 M
+(except) s
+/F-gs-font 7 7 SF
+63.8 342 M
+(:) s
+5 334 M
+(            error\(form,) s
+/Courier-Bold 7 7 SUF
+101.6 334 M
+("Exception encountered in HTML generation [encode\(\)]") s
+/F-gs-font 7 7 SF
+324.2 334 M
+(\)) s
+5 326 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 326 M
+(print) s
+/F-gs-font 7 7 SF
+76.4 326 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 326 M
+("<pre>") s
+/F-gs-font 7 7 SF
+5 318 M
+(            traceback.print_exc\(None,sys.stdout\)            ) s
+5 310 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 310 M
+(print) s
+/F-gs-font 7 7 SF
+76.4 310 M
+( ) s
+/Courier-Bold 7 7 SUF
+80.6 310 M
+("<pre>") s
+/F-gs-font 7 7 SF
+5 302 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 302 M
+(return) s
+/F-gs-font 7 7 SF
+5 286 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 286 M
+(# And that's all she wrote! :-\) Sorry, pun TRULY not intended.) s
+/F-gs-font 7 7 SF
+_R
+S
+%%Page: (1) 7
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 1 def
+/fname (SimpleCookie.py) def
+/fdir () def
+/ftail (SimpleCookie.py) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (09/11/00) def
+/modtimestr (17:40:58) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+/Courier-Oblique 7 7 SUF
+5 518 M
+(#!/usr/bin/env python) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 510 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 494 M
+(####) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 486 M
+(# Copyright \(C\) 1998 GTE Internetworking) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 478 M
+(#    Author: Timothy O'Malley <timo@bbn.com>) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 470 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 462 M
+(# This source is free software; you can redistribute it and/or) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 454 M
+(# modify it under the terms of the GNU Library General Public) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 446 M
+(# License as published by the Free Software Foundation, version 2.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 438 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 430 M
+(# This library is distributed in the hope that it will be useful,) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 422 M
+(# but WITHOUT ANY WARRANTY; without even the implied warranty of) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 414 M
+(# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 406 M
+(# Library General Public License for more details.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 398 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 390 M
+(# You can retrieve a copy of the GNU Library General Public License) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 382 M
+(# from http://www.gnu.org/.  For a copy via US Mail, write to the) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 374 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 366 M
+(#    Free Software Foundation, Inc.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 358 M
+(#    59 Temple Place - Suite 330,) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 350 M
+(#    Boston, MA  02111-1307) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 342 M
+(#    USA) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 334 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 326 M
+(# GTE Internetworking can be reached electronically via the URL) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 318 M
+(# http://www.bbn.com or via US Mail at) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 310 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 302 M
+(#    GTE Internetworking) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 294 M
+(#    5525 N. MacArthur Boulevard) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 286 M
+(#    Suite 320) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 278 M
+(#    Irving, Texas 75038) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 270 M
+(#    USA) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 262 M
+(####) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 254 M
+(# ) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 246 M
+(# $Id: wf.ps,v 1.1.1.1 2001/10/23 06:17:17 pshafae Exp $) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 238 M
+(#  by Timothy O'Malley <timo@bbn.com>) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 230 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 222 M
+(#  Cookie.py is an rewrite for the old nscookie.py module.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 214 M
+(#    Under the old module, it was not possible to set attributes,) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 206 M
+(#    such as "secure" or "Max-Age" on key,value granularity.  This) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 198 M
+(#    shortcoming has been addressed in Cookie.py but has come at) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 190 M
+(#    the cost of a slightly changed interface.  Cookie.py also) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 182 M
+(#    requires the re and cPickle modules introduced in Python-1.5.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 174 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 166 M
+(#  The original idea to treat Cookies as a dictionary came from) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 158 M
+(#  Dave Mitchel \(davem@magnet.com\) in 1995, when he released the) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 150 M
+(#  first version of nscookie.py.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 142 M
+(####) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+5 126 M
+(""") s
+5 118 M
+(Here's a sample session to show how to use this module.) s
+5 110 M
+(At the moment, this is the only documentation.) s
+5 94 M
+(Importing is easy..) s
+5 78 M
+(  >>> import Cookie) s
+5 62 M
+(Most of the time you start by creating a cookie.  The __init__) s
+5 54 M
+(routine can take several arguments, but that isn't covered here.) s
+5 38 M
+(  >>> C = Cookie.Cookie\(\)) s
+5 22 M
+(Now, you can add values to the Cookie just as is if it were a) s
+5 14 M
+(dictionary.) s
+377 518 M
+(  >>> C["joe"] = "a cookie") s
+377 510 M
+(  >>> C) s
+377 502 M
+(  Set-Cookie: joe="a cookie";) s
+377 486 M
+(Notice that the printable representation of a Cookie is the) s
+377 478 M
+(appropriate format for a Set-Cookie: header.  This is the) s
+377 470 M
+(default behavior.  You can change the header by using the) s
+377 462 M
+(the .output\(\) function) s
+377 446 M
+(  >>> C.output\("Cookie:"\)) s
+377 438 M
+(  'Cookie: joe="a cookie";') s
+377 414 M
+(The .load\(\) method of a Cookie extracts cookies from a string.  In) s
+377 406 M
+(a CGI script, you would use this method to extract the cookies) s
+377 398 M
+(from the HTTP_COOKIE environment variable.) s
+377 382 M
+(  >>> C.load\("mary=hadalittlelamb;"\)) s
+377 374 M
+(  >>> C) s
+377 366 M
+(  Set-Cookie: mary=hadalittlelamb;) s
+377 358 M
+(  Set-Cookie: joe="a cookie";) s
+377 342 M
+(Each element of the Cookie also supports all of the RFC 2109) s
+377 334 M
+(Cookie attributes.  Here's an example which sets the Path) s
+377 326 M
+(attribute.) s
+377 310 M
+(  >>> C["joe"]["path"] = "/home/joe") s
+377 302 M
+(  >>> C) s
+377 294 M
+(  Set-Cookie: mary=hadalittlelamb;) s
+377 286 M
+(  Set-Cookie: joe="a cookie"; Path=/home/joe;) s
+377 270 M
+(Before I forget, the .load\(\) method is pretty smart about) s
+377 262 M
+(identifying a cookie.  Escaped quotation marks and nested) s
+377 254 M
+(semicolons do not confuse it.) s
+377 238 M
+(  >>> C.load\('lobotomy="joe=wolf; lobotomy=\\\\"nested quote\\\\"; mark=\\\\012;";'\)) s
+377 230 M
+(  >>> C) s
+377 222 M
+(  Set-Cookie: mary=hadalittlelamb;) s
+377 214 M
+(  Set-Cookie: joe="a cookie"; Path=/home/joe;) s
+377 206 M
+(  Set-Cookie: lobotomy="joe=wolf; lobotomy=\\"nested quote\\"; mark=\\012;";) s
+377 182 M
+(Each dictionary element has a 'value' attribute, which gives you) s
+377 174 M
+(back the value associated with the key.) s
+377 158 M
+(  >>> C["joe"].value) s
+377 150 M
+(  'a cookie') s
+377 142 M
+(  >>> C["lobotomy"].value) s
+377 134 M
+(  'joe=wolf; lobotomy="nested quote"; mark=\\012;') s
+377 118 M
+(If you set a cookie to a non-string object, that object is) s
+377 110 M
+(automatically pickled \(using cPickle or pickle\) in the) s
+377 102 M
+(Set-Cookie: header.) s
+377 86 M
+(  >>> C["int"] = 7) s
+377 78 M
+(  >>> C) s
+377 70 M
+(  Set-Cookie: lobotomy="joe=wolf; lobotomy=\\"nested quote\\"; mark=\\012;";) s
+377 62 M
+(  Set-Cookie: joe="a cookie"; Path=/home/joe;) s
+377 54 M
+(  Set-Cookie: mary=hadalittlelamb;) s
+377 46 M
+(  Set-Cookie: int="I7\\012.";) s
+377 30 M
+(If the .load\(\) method finds a pickled object in the string, then) s
+377 22 M
+(it automatically unpickles it.  The 'value' attribute gives you back) s
+377 14 M
+(the true value, not the encoded representation.) s
+_R
+S
+%%Page: (2) 8
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 2 def
+/fname (SimpleCookie.py) def
+/fdir () def
+/ftail (SimpleCookie.py) def
+/Courier-Bold 7 7 SUF
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (09/11/00) def
+/modtimestr (17:40:58) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 510 M
+(  >>> C.load\('anotherint="I45\\\\012.";'\)) s
+5 494 M
+(  >>> C["anotherint"].value) s
+5 486 M
+(  45) s
+5 478 M
+(  >>> C["int"].value) s
+5 470 M
+(  7) s
+5 454 M
+(  >>> C) s
+5 446 M
+(  Set-Cookie: lobotomy="joe=wolf; lobotomy=\\"nested quote\\"; mark=\\012;";) s
+5 438 M
+(  Set-Cookie: joe="a cookie"; Path=/home/joe;) s
+5 430 M
+(  Set-Cookie: mary=hadalittlelamb;) s
+5 422 M
+(  Set-Cookie: anotherint="I45\\012.";) s
+5 414 M
+(  Set-Cookie: int="I7\\012.";) s
+5 398 M
+(Finally, the encoding/decoding behavior is controllable by) s
+5 390 M
+(two methods of the Cookie:) s
+5 374 M
+(  Cookie.net_setfunc\(\)    Takes in an encoded string and returns a value) s
+5 366 M
+(  Cookie.user_setfunc\(\)  Takes in a value and returns the encoded string) s
+5 350 M
+(By default, these functions are defined in the Cookie module, but) s
+5 342 M
+(you should feel free to override them.) s
+5 326 M
+(  >>> C.net_setfunc) s
+5 318 M
+(  <function _debabelize at c1558>) s
+5 310 M
+(  >>> C.user_setfunc) s
+5 302 M
+(  <function _babelize at c1530>) s
+5 286 M
+(Finis.) s
+5 278 M
+(""") s
+/F-gs-font 7 7 SF
+17.6 278 M
+(  ) s
+/Courier-Oblique 7 7 SUF
+26 278 M
+(#") s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 270 M
+(#    ^) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 262 M
+(#    |----helps out font-lock) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 246 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 238 M
+(# Import our required modules) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 230 M
+(# ) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+5 222 M
+(import) s
+/F-gs-font 7 7 SF
+30.2 222 M
+( string, sys) s
+/Courier-Bold 7 7 SUF
+5 214 M
+(from) s
+/F-gs-font 7 7 SF
+21.8 214 M
+( UserDict ) s
+/Courier-Bold 7 7 SUF
+63.8 214 M
+(import) s
+/F-gs-font 7 7 SF
+89 214 M
+( UserDict) s
+5 198 M
+(try:) s
+5 190 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 190 M
+(from) s
+/F-gs-font 7 7 SF
+38.6 190 M
+( cPickle ) s
+/Courier-Bold 7 7 SUF
+76.4 190 M
+(import) s
+/F-gs-font 7 7 SF
+101.6 190 M
+( dumps, loads) s
+/Courier-Bold 7 7 SUF
+5 182 M
+(except) s
+/F-gs-font 7 7 SF
+30.2 182 M
+( ImportError:) s
+5 174 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 174 M
+(from) s
+/F-gs-font 7 7 SF
+38.6 174 M
+( pickle ) s
+/Courier-Bold 7 7 SUF
+72.2 174 M
+(import) s
+/F-gs-font 7 7 SF
+97.4 174 M
+( dumps, loads) s
+5 158 M
+(try:) s
+5 150 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 150 M
+(import) s
+/F-gs-font 7 7 SF
+47 150 M
+( re) s
+/Courier-Bold 7 7 SUF
+5 142 M
+(except) s
+/F-gs-font 7 7 SF
+30.2 142 M
+( ImportError:) s
+5 134 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 134 M
+(raise) s
+/F-gs-font 7 7 SF
+42.8 134 M
+( ImportError, ) s
+/Courier-Bold 7 7 SUF
+101.6 134 M
+("Cookie.py requires 're' from Python 1.5 or later") s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 110 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 102 M
+(# Define an exception visible to External modules) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 94 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+5 86 M
+(class) s
+/F-gs-font 7 7 SF
+26 86 M
+( CookieError\(Exception\):) s
+5 78 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 78 M
+(pass) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 54 M
+(# These quoting routines conform to the RFC2109 specification, which in) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 46 M
+(# turn references the character definitions from RFC2068.  They provide) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 38 M
+(# a two-way quoting algorithm.  Any non-text character is translated) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 30 M
+(# into a 4 character sequence: a forward-slash followed by the) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 22 M
+(# three-digit octal equivalent of the character.  Any '\\' or '"' is) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 14 M
+(# quoted with a preceeding '\\' slash.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 6 M
+(# ) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 518 M
+(# These are taken from RFC2068 and RFC2109.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 510 M
+(#      _LegalChars      is the list of chars which don't require "'s) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 502 M
+(#      _Translator      hash-table for fast quoting) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 494 M
+(#) s
+/F-gs-font 7 7 SF
+377 486 M
+(_LegalChars      = string.letters + string.digits + ) s
+/Courier-Bold 7 7 SUF
+595.4 486 M
+("!#$%&'*+-.^_`|~") s
+/F-gs-font 7 7 SF
+377 478 M
+(_Translator      = {) s
+377 470 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 470 M
+('\\000') s
+/F-gs-font 7 7 SF
+419 470 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 470 M
+('\\\\000') s
+/F-gs-font 7 7 SF
+461 470 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 470 M
+('\\001') s
+/F-gs-font 7 7 SF
+498.8 470 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 470 M
+('\\\\001') s
+/F-gs-font 7 7 SF
+540.8 470 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 470 M
+('\\002') s
+/F-gs-font 7 7 SF
+578.6 470 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 470 M
+('\\\\002') s
+/F-gs-font 7 7 SF
+620.6 470 M
+(,) s
+377 462 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 462 M
+('\\003') s
+/F-gs-font 7 7 SF
+419 462 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 462 M
+('\\\\003') s
+/F-gs-font 7 7 SF
+461 462 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 462 M
+('\\004') s
+/F-gs-font 7 7 SF
+498.8 462 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 462 M
+('\\\\004') s
+/F-gs-font 7 7 SF
+540.8 462 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 462 M
+('\\005') s
+/F-gs-font 7 7 SF
+578.6 462 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 462 M
+('\\\\005') s
+/F-gs-font 7 7 SF
+620.6 462 M
+(,) s
+377 454 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 454 M
+('\\006') s
+/F-gs-font 7 7 SF
+419 454 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 454 M
+('\\\\006') s
+/F-gs-font 7 7 SF
+461 454 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 454 M
+('\\007') s
+/F-gs-font 7 7 SF
+498.8 454 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 454 M
+('\\\\007') s
+/F-gs-font 7 7 SF
+540.8 454 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 454 M
+('\\010') s
+/F-gs-font 7 7 SF
+578.6 454 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 454 M
+('\\\\010') s
+/F-gs-font 7 7 SF
+620.6 454 M
+(,) s
+377 446 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 446 M
+('\\011') s
+/F-gs-font 7 7 SF
+419 446 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 446 M
+('\\\\011') s
+/F-gs-font 7 7 SF
+461 446 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 446 M
+('\\012') s
+/F-gs-font 7 7 SF
+498.8 446 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 446 M
+('\\\\012') s
+/F-gs-font 7 7 SF
+540.8 446 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 446 M
+('\\013') s
+/F-gs-font 7 7 SF
+578.6 446 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 446 M
+('\\\\013') s
+/F-gs-font 7 7 SF
+620.6 446 M
+(,) s
+377 438 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 438 M
+('\\014') s
+/F-gs-font 7 7 SF
+419 438 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 438 M
+('\\\\014') s
+/F-gs-font 7 7 SF
+461 438 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 438 M
+('\\015') s
+/F-gs-font 7 7 SF
+498.8 438 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 438 M
+('\\\\015') s
+/F-gs-font 7 7 SF
+540.8 438 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 438 M
+('\\016') s
+/F-gs-font 7 7 SF
+578.6 438 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 438 M
+('\\\\016') s
+/F-gs-font 7 7 SF
+620.6 438 M
+(,) s
+377 430 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 430 M
+('\\017') s
+/F-gs-font 7 7 SF
+419 430 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 430 M
+('\\\\017') s
+/F-gs-font 7 7 SF
+461 430 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 430 M
+('\\020') s
+/F-gs-font 7 7 SF
+498.8 430 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 430 M
+('\\\\020') s
+/F-gs-font 7 7 SF
+540.8 430 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 430 M
+('\\021') s
+/F-gs-font 7 7 SF
+578.6 430 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 430 M
+('\\\\021') s
+/F-gs-font 7 7 SF
+620.6 430 M
+(,) s
+377 422 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 422 M
+('\\022') s
+/F-gs-font 7 7 SF
+419 422 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 422 M
+('\\\\022') s
+/F-gs-font 7 7 SF
+461 422 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 422 M
+('\\023') s
+/F-gs-font 7 7 SF
+498.8 422 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 422 M
+('\\\\023') s
+/F-gs-font 7 7 SF
+540.8 422 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 422 M
+('\\024') s
+/F-gs-font 7 7 SF
+578.6 422 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 422 M
+('\\\\024') s
+/F-gs-font 7 7 SF
+620.6 422 M
+(,) s
+377 414 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 414 M
+('\\025') s
+/F-gs-font 7 7 SF
+419 414 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 414 M
+('\\\\025') s
+/F-gs-font 7 7 SF
+461 414 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 414 M
+('\\026') s
+/F-gs-font 7 7 SF
+498.8 414 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 414 M
+('\\\\026') s
+/F-gs-font 7 7 SF
+540.8 414 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 414 M
+('\\027') s
+/F-gs-font 7 7 SF
+578.6 414 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 414 M
+('\\\\027') s
+/F-gs-font 7 7 SF
+620.6 414 M
+(,) s
+377 406 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 406 M
+('\\030') s
+/F-gs-font 7 7 SF
+419 406 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 406 M
+('\\\\030') s
+/F-gs-font 7 7 SF
+461 406 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 406 M
+('\\031') s
+/F-gs-font 7 7 SF
+498.8 406 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 406 M
+('\\\\031') s
+/F-gs-font 7 7 SF
+540.8 406 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 406 M
+('\\032') s
+/F-gs-font 7 7 SF
+578.6 406 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 406 M
+('\\\\032') s
+/F-gs-font 7 7 SF
+620.6 406 M
+(,) s
+377 398 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 398 M
+('\\033') s
+/F-gs-font 7 7 SF
+419 398 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 398 M
+('\\\\033') s
+/F-gs-font 7 7 SF
+461 398 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 398 M
+('\\034') s
+/F-gs-font 7 7 SF
+498.8 398 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 398 M
+('\\\\034') s
+/F-gs-font 7 7 SF
+540.8 398 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 398 M
+('\\035') s
+/F-gs-font 7 7 SF
+578.6 398 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 398 M
+('\\\\035') s
+/F-gs-font 7 7 SF
+620.6 398 M
+(,) s
+377 390 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 390 M
+('\\036') s
+/F-gs-font 7 7 SF
+419 390 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 390 M
+('\\\\036') s
+/F-gs-font 7 7 SF
+461 390 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 390 M
+('\\037') s
+/F-gs-font 7 7 SF
+498.8 390 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 390 M
+('\\\\037') s
+/F-gs-font 7 7 SF
+540.8 390 M
+(,) s
+377 374 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 374 M
+('"') s
+/F-gs-font 7 7 SF
+406.4 374 M
+( : ) s
+/Courier-Bold 7 7 SUF
+419 374 M
+('\\\\"') s
+/F-gs-font 7 7 SF
+440 374 M
+(,      ) s
+/Courier-Bold 7 7 SUF
+469.4 374 M
+('\\\\') s
+/F-gs-font 7 7 SF
+486.2 374 M
+( : ) s
+/Courier-Bold 7 7 SUF
+498.8 374 M
+('\\\\\\\\') s
+/F-gs-font 7 7 SF
+524 374 M
+(,) s
+377 358 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 358 M
+('\\177') s
+/F-gs-font 7 7 SF
+419 358 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 358 M
+('\\\\177') s
+/F-gs-font 7 7 SF
+461 358 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 358 M
+('\\200') s
+/F-gs-font 7 7 SF
+498.8 358 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 358 M
+('\\\\200') s
+/F-gs-font 7 7 SF
+540.8 358 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 358 M
+('\\201') s
+/F-gs-font 7 7 SF
+578.6 358 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 358 M
+('\\\\201') s
+/F-gs-font 7 7 SF
+620.6 358 M
+(,) s
+377 350 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 350 M
+('\\202') s
+/F-gs-font 7 7 SF
+419 350 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 350 M
+('\\\\202') s
+/F-gs-font 7 7 SF
+461 350 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 350 M
+('\\203') s
+/F-gs-font 7 7 SF
+498.8 350 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 350 M
+('\\\\203') s
+/F-gs-font 7 7 SF
+540.8 350 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 350 M
+('\\204') s
+/F-gs-font 7 7 SF
+578.6 350 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 350 M
+('\\\\204') s
+/F-gs-font 7 7 SF
+620.6 350 M
+(,) s
+377 342 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 342 M
+('\\205') s
+/F-gs-font 7 7 SF
+419 342 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 342 M
+('\\\\205') s
+/F-gs-font 7 7 SF
+461 342 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 342 M
+('\\206') s
+/F-gs-font 7 7 SF
+498.8 342 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 342 M
+('\\\\206') s
+/F-gs-font 7 7 SF
+540.8 342 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 342 M
+('\\207') s
+/F-gs-font 7 7 SF
+578.6 342 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 342 M
+('\\\\207') s
+/F-gs-font 7 7 SF
+620.6 342 M
+(,) s
+377 334 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 334 M
+('\\210') s
+/F-gs-font 7 7 SF
+419 334 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 334 M
+('\\\\210') s
+/F-gs-font 7 7 SF
+461 334 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 334 M
+('\\211') s
+/F-gs-font 7 7 SF
+498.8 334 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 334 M
+('\\\\211') s
+/F-gs-font 7 7 SF
+540.8 334 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 334 M
+('\\212') s
+/F-gs-font 7 7 SF
+578.6 334 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 334 M
+('\\\\212') s
+/F-gs-font 7 7 SF
+620.6 334 M
+(,) s
+377 326 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 326 M
+('\\213') s
+/F-gs-font 7 7 SF
+419 326 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 326 M
+('\\\\213') s
+/F-gs-font 7 7 SF
+461 326 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 326 M
+('\\214') s
+/F-gs-font 7 7 SF
+498.8 326 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 326 M
+('\\\\214') s
+/F-gs-font 7 7 SF
+540.8 326 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 326 M
+('\\215') s
+/F-gs-font 7 7 SF
+578.6 326 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 326 M
+('\\\\215') s
+/F-gs-font 7 7 SF
+620.6 326 M
+(,) s
+377 318 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 318 M
+('\\216') s
+/F-gs-font 7 7 SF
+419 318 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 318 M
+('\\\\216') s
+/F-gs-font 7 7 SF
+461 318 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 318 M
+('\\217') s
+/F-gs-font 7 7 SF
+498.8 318 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 318 M
+('\\\\217') s
+/F-gs-font 7 7 SF
+540.8 318 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 318 M
+('\\220') s
+/F-gs-font 7 7 SF
+578.6 318 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 318 M
+('\\\\220') s
+/F-gs-font 7 7 SF
+620.6 318 M
+(,) s
+377 310 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 310 M
+('\\221') s
+/F-gs-font 7 7 SF
+419 310 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 310 M
+('\\\\221') s
+/F-gs-font 7 7 SF
+461 310 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 310 M
+('\\222') s
+/F-gs-font 7 7 SF
+498.8 310 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 310 M
+('\\\\222') s
+/F-gs-font 7 7 SF
+540.8 310 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 310 M
+('\\223') s
+/F-gs-font 7 7 SF
+578.6 310 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 310 M
+('\\\\223') s
+/F-gs-font 7 7 SF
+620.6 310 M
+(,) s
+377 302 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 302 M
+('\\224') s
+/F-gs-font 7 7 SF
+419 302 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 302 M
+('\\\\224') s
+/F-gs-font 7 7 SF
+461 302 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 302 M
+('\\225') s
+/F-gs-font 7 7 SF
+498.8 302 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 302 M
+('\\\\225') s
+/F-gs-font 7 7 SF
+540.8 302 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 302 M
+('\\226') s
+/F-gs-font 7 7 SF
+578.6 302 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 302 M
+('\\\\226') s
+/F-gs-font 7 7 SF
+620.6 302 M
+(,) s
+377 294 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 294 M
+('\\227') s
+/F-gs-font 7 7 SF
+419 294 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 294 M
+('\\\\227') s
+/F-gs-font 7 7 SF
+461 294 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 294 M
+('\\230') s
+/F-gs-font 7 7 SF
+498.8 294 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 294 M
+('\\\\230') s
+/F-gs-font 7 7 SF
+540.8 294 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 294 M
+('\\231') s
+/F-gs-font 7 7 SF
+578.6 294 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 294 M
+('\\\\231') s
+/F-gs-font 7 7 SF
+620.6 294 M
+(,) s
+377 286 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 286 M
+('\\232') s
+/F-gs-font 7 7 SF
+419 286 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 286 M
+('\\\\232') s
+/F-gs-font 7 7 SF
+461 286 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 286 M
+('\\233') s
+/F-gs-font 7 7 SF
+498.8 286 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 286 M
+('\\\\233') s
+/F-gs-font 7 7 SF
+540.8 286 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 286 M
+('\\234') s
+/F-gs-font 7 7 SF
+578.6 286 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 286 M
+('\\\\234') s
+/F-gs-font 7 7 SF
+620.6 286 M
+(,) s
+377 278 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 278 M
+('\\235') s
+/F-gs-font 7 7 SF
+419 278 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 278 M
+('\\\\235') s
+/F-gs-font 7 7 SF
+461 278 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 278 M
+('\\236') s
+/F-gs-font 7 7 SF
+498.8 278 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 278 M
+('\\\\236') s
+/F-gs-font 7 7 SF
+540.8 278 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 278 M
+('\\237') s
+/F-gs-font 7 7 SF
+578.6 278 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 278 M
+('\\\\237') s
+/F-gs-font 7 7 SF
+620.6 278 M
+(,) s
+377 270 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 270 M
+('\\240') s
+/F-gs-font 7 7 SF
+419 270 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 270 M
+('\\\\240') s
+/F-gs-font 7 7 SF
+461 270 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 270 M
+('\\241') s
+/F-gs-font 7 7 SF
+498.8 270 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 270 M
+('\\\\241') s
+/F-gs-font 7 7 SF
+540.8 270 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 270 M
+('\\242') s
+/F-gs-font 7 7 SF
+578.6 270 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 270 M
+('\\\\242') s
+/F-gs-font 7 7 SF
+620.6 270 M
+(,) s
+377 262 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 262 M
+('\\243') s
+/F-gs-font 7 7 SF
+419 262 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 262 M
+('\\\\243') s
+/F-gs-font 7 7 SF
+461 262 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 262 M
+('\\244') s
+/F-gs-font 7 7 SF
+498.8 262 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 262 M
+('\\\\244') s
+/F-gs-font 7 7 SF
+540.8 262 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 262 M
+('\\245') s
+/F-gs-font 7 7 SF
+578.6 262 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 262 M
+('\\\\245') s
+/F-gs-font 7 7 SF
+620.6 262 M
+(,) s
+377 254 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 254 M
+('\\246') s
+/F-gs-font 7 7 SF
+419 254 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 254 M
+('\\\\246') s
+/F-gs-font 7 7 SF
+461 254 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 254 M
+('\\247') s
+/F-gs-font 7 7 SF
+498.8 254 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 254 M
+('\\\\247') s
+/F-gs-font 7 7 SF
+540.8 254 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 254 M
+('\\250') s
+/F-gs-font 7 7 SF
+578.6 254 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 254 M
+('\\\\250') s
+/F-gs-font 7 7 SF
+620.6 254 M
+(,) s
+377 246 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 246 M
+('\\251') s
+/F-gs-font 7 7 SF
+419 246 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 246 M
+('\\\\251') s
+/F-gs-font 7 7 SF
+461 246 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 246 M
+('\\252') s
+/F-gs-font 7 7 SF
+498.8 246 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 246 M
+('\\\\252') s
+/F-gs-font 7 7 SF
+540.8 246 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 246 M
+('\\253') s
+/F-gs-font 7 7 SF
+578.6 246 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 246 M
+('\\\\253') s
+/F-gs-font 7 7 SF
+620.6 246 M
+(,) s
+377 238 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 238 M
+('\\254') s
+/F-gs-font 7 7 SF
+419 238 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 238 M
+('\\\\254') s
+/F-gs-font 7 7 SF
+461 238 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 238 M
+('\\255') s
+/F-gs-font 7 7 SF
+498.8 238 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 238 M
+('\\\\255') s
+/F-gs-font 7 7 SF
+540.8 238 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 238 M
+('\\256') s
+/F-gs-font 7 7 SF
+578.6 238 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 238 M
+('\\\\256') s
+/F-gs-font 7 7 SF
+620.6 238 M
+(,) s
+377 230 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 230 M
+('\\257') s
+/F-gs-font 7 7 SF
+419 230 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 230 M
+('\\\\257') s
+/F-gs-font 7 7 SF
+461 230 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 230 M
+('\\260') s
+/F-gs-font 7 7 SF
+498.8 230 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 230 M
+('\\\\260') s
+/F-gs-font 7 7 SF
+540.8 230 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 230 M
+('\\261') s
+/F-gs-font 7 7 SF
+578.6 230 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 230 M
+('\\\\261') s
+/F-gs-font 7 7 SF
+620.6 230 M
+(,) s
+377 222 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 222 M
+('\\262') s
+/F-gs-font 7 7 SF
+419 222 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 222 M
+('\\\\262') s
+/F-gs-font 7 7 SF
+461 222 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 222 M
+('\\263') s
+/F-gs-font 7 7 SF
+498.8 222 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 222 M
+('\\\\263') s
+/F-gs-font 7 7 SF
+540.8 222 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 222 M
+('\\264') s
+/F-gs-font 7 7 SF
+578.6 222 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 222 M
+('\\\\264') s
+/F-gs-font 7 7 SF
+620.6 222 M
+(,) s
+377 214 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 214 M
+('\\265') s
+/F-gs-font 7 7 SF
+419 214 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 214 M
+('\\\\265') s
+/F-gs-font 7 7 SF
+461 214 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 214 M
+('\\266') s
+/F-gs-font 7 7 SF
+498.8 214 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 214 M
+('\\\\266') s
+/F-gs-font 7 7 SF
+540.8 214 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 214 M
+('\\267') s
+/F-gs-font 7 7 SF
+578.6 214 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 214 M
+('\\\\267') s
+/F-gs-font 7 7 SF
+620.6 214 M
+(,) s
+377 206 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 206 M
+('\\270') s
+/F-gs-font 7 7 SF
+419 206 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 206 M
+('\\\\270') s
+/F-gs-font 7 7 SF
+461 206 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 206 M
+('\\271') s
+/F-gs-font 7 7 SF
+498.8 206 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 206 M
+('\\\\271') s
+/F-gs-font 7 7 SF
+540.8 206 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 206 M
+('\\272') s
+/F-gs-font 7 7 SF
+578.6 206 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 206 M
+('\\\\272') s
+/F-gs-font 7 7 SF
+620.6 206 M
+(,) s
+377 198 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 198 M
+('\\273') s
+/F-gs-font 7 7 SF
+419 198 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 198 M
+('\\\\273') s
+/F-gs-font 7 7 SF
+461 198 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 198 M
+('\\274') s
+/F-gs-font 7 7 SF
+498.8 198 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 198 M
+('\\\\274') s
+/F-gs-font 7 7 SF
+540.8 198 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 198 M
+('\\275') s
+/F-gs-font 7 7 SF
+578.6 198 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 198 M
+('\\\\275') s
+/F-gs-font 7 7 SF
+620.6 198 M
+(,) s
+377 190 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 190 M
+('\\276') s
+/F-gs-font 7 7 SF
+419 190 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 190 M
+('\\\\276') s
+/F-gs-font 7 7 SF
+461 190 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 190 M
+('\\277') s
+/F-gs-font 7 7 SF
+498.8 190 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 190 M
+('\\\\277') s
+/F-gs-font 7 7 SF
+540.8 190 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 190 M
+('\\300') s
+/F-gs-font 7 7 SF
+578.6 190 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 190 M
+('\\\\300') s
+/F-gs-font 7 7 SF
+620.6 190 M
+(,) s
+377 182 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 182 M
+('\\301') s
+/F-gs-font 7 7 SF
+419 182 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 182 M
+('\\\\301') s
+/F-gs-font 7 7 SF
+461 182 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 182 M
+('\\302') s
+/F-gs-font 7 7 SF
+498.8 182 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 182 M
+('\\\\302') s
+/F-gs-font 7 7 SF
+540.8 182 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 182 M
+('\\303') s
+/F-gs-font 7 7 SF
+578.6 182 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 182 M
+('\\\\303') s
+/F-gs-font 7 7 SF
+620.6 182 M
+(,) s
+377 174 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 174 M
+('\\304') s
+/F-gs-font 7 7 SF
+419 174 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 174 M
+('\\\\304') s
+/F-gs-font 7 7 SF
+461 174 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 174 M
+('\\305') s
+/F-gs-font 7 7 SF
+498.8 174 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 174 M
+('\\\\305') s
+/F-gs-font 7 7 SF
+540.8 174 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 174 M
+('\\306') s
+/F-gs-font 7 7 SF
+578.6 174 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 174 M
+('\\\\306') s
+/F-gs-font 7 7 SF
+620.6 174 M
+(,) s
+377 166 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 166 M
+('\\307') s
+/F-gs-font 7 7 SF
+419 166 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 166 M
+('\\\\307') s
+/F-gs-font 7 7 SF
+461 166 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 166 M
+('\\310') s
+/F-gs-font 7 7 SF
+498.8 166 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 166 M
+('\\\\310') s
+/F-gs-font 7 7 SF
+540.8 166 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 166 M
+('\\311') s
+/F-gs-font 7 7 SF
+578.6 166 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 166 M
+('\\\\311') s
+/F-gs-font 7 7 SF
+620.6 166 M
+(,) s
+377 158 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 158 M
+('\\312') s
+/F-gs-font 7 7 SF
+419 158 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 158 M
+('\\\\312') s
+/F-gs-font 7 7 SF
+461 158 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 158 M
+('\\313') s
+/F-gs-font 7 7 SF
+498.8 158 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 158 M
+('\\\\313') s
+/F-gs-font 7 7 SF
+540.8 158 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 158 M
+('\\314') s
+/F-gs-font 7 7 SF
+578.6 158 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 158 M
+('\\\\314') s
+/F-gs-font 7 7 SF
+620.6 158 M
+(,) s
+377 150 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 150 M
+('\\315') s
+/F-gs-font 7 7 SF
+419 150 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 150 M
+('\\\\315') s
+/F-gs-font 7 7 SF
+461 150 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 150 M
+('\\316') s
+/F-gs-font 7 7 SF
+498.8 150 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 150 M
+('\\\\316') s
+/F-gs-font 7 7 SF
+540.8 150 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 150 M
+('\\317') s
+/F-gs-font 7 7 SF
+578.6 150 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 150 M
+('\\\\317') s
+/F-gs-font 7 7 SF
+620.6 150 M
+(,) s
+377 142 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 142 M
+('\\320') s
+/F-gs-font 7 7 SF
+419 142 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 142 M
+('\\\\320') s
+/F-gs-font 7 7 SF
+461 142 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 142 M
+('\\321') s
+/F-gs-font 7 7 SF
+498.8 142 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 142 M
+('\\\\321') s
+/F-gs-font 7 7 SF
+540.8 142 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 142 M
+('\\322') s
+/F-gs-font 7 7 SF
+578.6 142 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 142 M
+('\\\\322') s
+/F-gs-font 7 7 SF
+620.6 142 M
+(,) s
+377 134 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 134 M
+('\\323') s
+/F-gs-font 7 7 SF
+419 134 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 134 M
+('\\\\323') s
+/F-gs-font 7 7 SF
+461 134 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 134 M
+('\\324') s
+/F-gs-font 7 7 SF
+498.8 134 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 134 M
+('\\\\324') s
+/F-gs-font 7 7 SF
+540.8 134 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 134 M
+('\\325') s
+/F-gs-font 7 7 SF
+578.6 134 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 134 M
+('\\\\325') s
+/F-gs-font 7 7 SF
+620.6 134 M
+(,) s
+377 126 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 126 M
+('\\326') s
+/F-gs-font 7 7 SF
+419 126 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 126 M
+('\\\\326') s
+/F-gs-font 7 7 SF
+461 126 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 126 M
+('\\327') s
+/F-gs-font 7 7 SF
+498.8 126 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 126 M
+('\\\\327') s
+/F-gs-font 7 7 SF
+540.8 126 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 126 M
+('\\330') s
+/F-gs-font 7 7 SF
+578.6 126 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 126 M
+('\\\\330') s
+/F-gs-font 7 7 SF
+620.6 126 M
+(,) s
+377 118 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 118 M
+('\\331') s
+/F-gs-font 7 7 SF
+419 118 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 118 M
+('\\\\331') s
+/F-gs-font 7 7 SF
+461 118 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 118 M
+('\\332') s
+/F-gs-font 7 7 SF
+498.8 118 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 118 M
+('\\\\332') s
+/F-gs-font 7 7 SF
+540.8 118 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 118 M
+('\\333') s
+/F-gs-font 7 7 SF
+578.6 118 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 118 M
+('\\\\333') s
+/F-gs-font 7 7 SF
+620.6 118 M
+(,) s
+377 110 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 110 M
+('\\334') s
+/F-gs-font 7 7 SF
+419 110 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 110 M
+('\\\\334') s
+/F-gs-font 7 7 SF
+461 110 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 110 M
+('\\335') s
+/F-gs-font 7 7 SF
+498.8 110 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 110 M
+('\\\\335') s
+/F-gs-font 7 7 SF
+540.8 110 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 110 M
+('\\336') s
+/F-gs-font 7 7 SF
+578.6 110 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 110 M
+('\\\\336') s
+/F-gs-font 7 7 SF
+620.6 110 M
+(,) s
+377 102 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 102 M
+('\\337') s
+/F-gs-font 7 7 SF
+419 102 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 102 M
+('\\\\337') s
+/F-gs-font 7 7 SF
+461 102 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 102 M
+('\\340') s
+/F-gs-font 7 7 SF
+498.8 102 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 102 M
+('\\\\340') s
+/F-gs-font 7 7 SF
+540.8 102 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 102 M
+('\\341') s
+/F-gs-font 7 7 SF
+578.6 102 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 102 M
+('\\\\341') s
+/F-gs-font 7 7 SF
+620.6 102 M
+(,) s
+377 94 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 94 M
+('\\342') s
+/F-gs-font 7 7 SF
+419 94 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 94 M
+('\\\\342') s
+/F-gs-font 7 7 SF
+461 94 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 94 M
+('\\343') s
+/F-gs-font 7 7 SF
+498.8 94 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 94 M
+('\\\\343') s
+/F-gs-font 7 7 SF
+540.8 94 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 94 M
+('\\344') s
+/F-gs-font 7 7 SF
+578.6 94 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 94 M
+('\\\\344') s
+/F-gs-font 7 7 SF
+620.6 94 M
+(,) s
+377 86 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 86 M
+('\\345') s
+/F-gs-font 7 7 SF
+419 86 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 86 M
+('\\\\345') s
+/F-gs-font 7 7 SF
+461 86 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 86 M
+('\\346') s
+/F-gs-font 7 7 SF
+498.8 86 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 86 M
+('\\\\346') s
+/F-gs-font 7 7 SF
+540.8 86 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 86 M
+('\\347') s
+/F-gs-font 7 7 SF
+578.6 86 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 86 M
+('\\\\347') s
+/F-gs-font 7 7 SF
+620.6 86 M
+(,) s
+377 78 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 78 M
+('\\350') s
+/F-gs-font 7 7 SF
+419 78 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 78 M
+('\\\\350') s
+/F-gs-font 7 7 SF
+461 78 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 78 M
+('\\351') s
+/F-gs-font 7 7 SF
+498.8 78 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 78 M
+('\\\\351') s
+/F-gs-font 7 7 SF
+540.8 78 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 78 M
+('\\352') s
+/F-gs-font 7 7 SF
+578.6 78 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 78 M
+('\\\\352') s
+/F-gs-font 7 7 SF
+620.6 78 M
+(,) s
+377 70 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 70 M
+('\\353') s
+/F-gs-font 7 7 SF
+419 70 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 70 M
+('\\\\353') s
+/F-gs-font 7 7 SF
+461 70 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 70 M
+('\\354') s
+/F-gs-font 7 7 SF
+498.8 70 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 70 M
+('\\\\354') s
+/F-gs-font 7 7 SF
+540.8 70 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 70 M
+('\\355') s
+/F-gs-font 7 7 SF
+578.6 70 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 70 M
+('\\\\355') s
+/F-gs-font 7 7 SF
+620.6 70 M
+(,) s
+377 62 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 62 M
+('\\356') s
+/F-gs-font 7 7 SF
+419 62 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 62 M
+('\\\\356') s
+/F-gs-font 7 7 SF
+461 62 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 62 M
+('\\357') s
+/F-gs-font 7 7 SF
+498.8 62 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 62 M
+('\\\\357') s
+/F-gs-font 7 7 SF
+540.8 62 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 62 M
+('\\360') s
+/F-gs-font 7 7 SF
+578.6 62 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 62 M
+('\\\\360') s
+/F-gs-font 7 7 SF
+620.6 62 M
+(,) s
+377 54 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 54 M
+('\\361') s
+/F-gs-font 7 7 SF
+419 54 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 54 M
+('\\\\361') s
+/F-gs-font 7 7 SF
+461 54 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 54 M
+('\\362') s
+/F-gs-font 7 7 SF
+498.8 54 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 54 M
+('\\\\362') s
+/F-gs-font 7 7 SF
+540.8 54 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 54 M
+('\\363') s
+/F-gs-font 7 7 SF
+578.6 54 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 54 M
+('\\\\363') s
+/F-gs-font 7 7 SF
+620.6 54 M
+(,) s
+377 46 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 46 M
+('\\364') s
+/F-gs-font 7 7 SF
+419 46 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 46 M
+('\\\\364') s
+/F-gs-font 7 7 SF
+461 46 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 46 M
+('\\365') s
+/F-gs-font 7 7 SF
+498.8 46 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 46 M
+('\\\\365') s
+/F-gs-font 7 7 SF
+540.8 46 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 46 M
+('\\366') s
+/F-gs-font 7 7 SF
+578.6 46 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 46 M
+('\\\\366') s
+/F-gs-font 7 7 SF
+620.6 46 M
+(,) s
+377 38 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 38 M
+('\\367') s
+/F-gs-font 7 7 SF
+419 38 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 38 M
+('\\\\367') s
+/F-gs-font 7 7 SF
+461 38 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 38 M
+('\\370') s
+/F-gs-font 7 7 SF
+498.8 38 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 38 M
+('\\\\370') s
+/F-gs-font 7 7 SF
+540.8 38 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 38 M
+('\\371') s
+/F-gs-font 7 7 SF
+578.6 38 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 38 M
+('\\\\371') s
+/F-gs-font 7 7 SF
+620.6 38 M
+(,) s
+377 30 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 30 M
+('\\372') s
+/F-gs-font 7 7 SF
+419 30 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 30 M
+('\\\\372') s
+/F-gs-font 7 7 SF
+461 30 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 30 M
+('\\373') s
+/F-gs-font 7 7 SF
+498.8 30 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 30 M
+('\\\\373') s
+/F-gs-font 7 7 SF
+540.8 30 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 30 M
+('\\374') s
+/F-gs-font 7 7 SF
+578.6 30 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 30 M
+('\\\\374') s
+/F-gs-font 7 7 SF
+620.6 30 M
+(,) s
+377 22 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 22 M
+('\\375') s
+/F-gs-font 7 7 SF
+419 22 M
+( : ) s
+/Courier-Bold 7 7 SUF
+431.6 22 M
+('\\\\375') s
+/F-gs-font 7 7 SF
+461 22 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+473.6 22 M
+('\\376') s
+/F-gs-font 7 7 SF
+498.8 22 M
+( : ) s
+/Courier-Bold 7 7 SUF
+511.4 22 M
+('\\\\376') s
+/F-gs-font 7 7 SF
+540.8 22 M
+(,  ) s
+/Courier-Bold 7 7 SUF
+553.4 22 M
+('\\377') s
+/F-gs-font 7 7 SF
+578.6 22 M
+( : ) s
+/Courier-Bold 7 7 SUF
+591.2 22 M
+('\\\\377') s
+/F-gs-font 7 7 SF
+377 14 M
+(    }) s
+_R
+S
+%%Page: (3) 9
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 3 def
+/fname (SimpleCookie.py) def
+/fdir () def
+/ftail (SimpleCookie.py) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (09/11/00) def
+/modtimestr (17:40:58) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+/Courier-Bold 7 7 SUF
+5 518 M
+(def) s
+/F-gs-font 7 7 SF
+17.6 518 M
+( ) s
+/Courier-Bold 7 7 SUF
+21.8 518 M
+(_quote) s
+/F-gs-font 7 7 SF
+47 518 M
+(\(str, LegalChars=_LegalChars,) s
+5 510 M
+(    join=string.join, idmap=string._idmap, translate=string.translate\):) s
+5 502 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 502 M
+(#) s
+/F-gs-font 7 7 SF
+5 494 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 494 M
+(# If the string does not need to be double-quoted,) s
+/F-gs-font 7 7 SF
+5 486 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 486 M
+(# then just return the string.  Otherwise, surround) s
+/F-gs-font 7 7 SF
+5 478 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 478 M
+(# the string in doublequotes and precede quote \(with a \\\)) s
+/F-gs-font 7 7 SF
+5 470 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 470 M
+(# special characters.) s
+/F-gs-font 7 7 SF
+5 462 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 462 M
+(#) s
+/F-gs-font 7 7 SF
+5 454 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 454 M
+(if) s
+/F-gs-font 7 7 SF
+30.2 454 M
+( ) s
+/Courier-Bold 7 7 SUF
+34.4 454 M
+("") s
+/F-gs-font 7 7 SF
+42.8 454 M
+( == translate\(str, idmap, LegalChars\):) s
+5 446 M
+(                ) s
+/Courier-Bold 7 7 SUF
+72.2 446 M
+(return) s
+/F-gs-font 7 7 SF
+97.4 446 M
+( str) s
+5 438 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 438 M
+(else) s
+/F-gs-font 7 7 SF
+38.6 438 M
+(:) s
+5 430 M
+(                ) s
+/Courier-Bold 7 7 SUF
+72.2 430 M
+(return) s
+/F-gs-font 7 7 SF
+97.4 430 M
+( ) s
+/Courier-Bold 7 7 SUF
+101.6 430 M
+('"') s
+/F-gs-font 7 7 SF
+114.2 430 M
+( + join\( map\(_Translator.get, str, str\), ) s
+/Courier-Bold 7 7 SUF
+286.4 430 M
+("") s
+/F-gs-font 7 7 SF
+294.8 430 M
+( \) + ) s
+/Courier-Bold 7 7 SUF
+315.8 430 M
+('"') s
+/F-gs-font 7 7 SF
+328.4 430 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+5 422 M
+(# end _quote) s
+/F-gs-font 7 7 SF
+5 398 M
+(_OctalPatt = re.compile\(r) s
+/Courier-Bold 7 7 SUF
+110 398 M
+("\\\\[0-3][0-7][0-7]") s
+/F-gs-font 7 7 SF
+189.8 398 M
+(\)) s
+5 390 M
+(_QuotePatt = re.compile\(r) s
+/Courier-Bold 7 7 SUF
+110 390 M
+("[\\\\].") s
+/F-gs-font 7 7 SF
+139.4 390 M
+(\)) s
+/Courier-Bold 7 7 SUF
+5 374 M
+(def) s
+/F-gs-font 7 7 SF
+17.6 374 M
+( ) s
+/Courier-Bold 7 7 SUF
+21.8 374 M
+(_unquote) s
+/F-gs-font 7 7 SF
+55.4 374 M
+(\(str, join=string.join, atoi=string.atoi\):) s
+5 366 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 366 M
+(# If there aren't any doublequotes,) s
+/F-gs-font 7 7 SF
+5 358 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 358 M
+(# then there can't be any special characters.  See RFC 2109.) s
+/F-gs-font 7 7 SF
+5 350 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 350 M
+(if) s
+/F-gs-font 7 7 SF
+30.2 350 M
+(  len\(str\) < 2:) s
+5 342 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 342 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 342 M
+( str) s
+5 334 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 334 M
+(if) s
+/F-gs-font 7 7 SF
+30.2 334 M
+( str[0] != ) s
+/Courier-Bold 7 7 SUF
+76.4 334 M
+('"') s
+/F-gs-font 7 7 SF
+89 334 M
+( ) s
+/Courier-Bold 7 7 SUF
+93.2 334 M
+(or) s
+/F-gs-font 7 7 SF
+101.6 334 M
+( str[-1] != ) s
+/Courier-Bold 7 7 SUF
+152 334 M
+('"') s
+/F-gs-font 7 7 SF
+164.6 334 M
+(:) s
+5 326 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 326 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 326 M
+( str) s
+5 310 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 310 M
+(# We have to assume that we must decode this string.) s
+/F-gs-font 7 7 SF
+5 302 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 302 M
+(# Down to work.) s
+/F-gs-font 7 7 SF
+5 286 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 286 M
+(# Remove the "s) s
+/F-gs-font 7 7 SF
+5 278 M
+(    str = str[1:-1]) s
+5 270 M
+(        ) s
+5 262 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 262 M
+(# Check for special sequences.  Examples:) s
+/F-gs-font 7 7 SF
+5 254 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 254 M
+(#    \\012 --> \\n) s
+/F-gs-font 7 7 SF
+5 246 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 246 M
+(#    \\"  --> ") s
+/F-gs-font 7 7 SF
+5 238 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 238 M
+(#) s
+/F-gs-font 7 7 SF
+5 230 M
+(    i = 0) s
+5 222 M
+(    n = len\(str\)) s
+5 214 M
+(    res = []) s
+5 206 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 206 M
+(while) s
+/F-gs-font 7 7 SF
+42.8 206 M
+( 0 <= i < n:) s
+5 198 M
+(        Omatch = _OctalPatt.search\(str, i\)) s
+5 190 M
+(        Qmatch = _QuotePatt.search\(str, i\)) s
+5 182 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 182 M
+(if) s
+/F-gs-font 7 7 SF
+47 182 M
+( ) s
+/Courier-Bold 7 7 SUF
+51.2 182 M
+(not) s
+/F-gs-font 7 7 SF
+63.8 182 M
+( Omatch ) s
+/Courier-Bold 7 7 SUF
+97.4 182 M
+(and) s
+/F-gs-font 7 7 SF
+110 182 M
+( ) s
+/Courier-Bold 7 7 SUF
+114.2 182 M
+(not) s
+/F-gs-font 7 7 SF
+126.8 182 M
+( Qmatch:              ) s
+/Courier-Oblique 7 7 SUF
+219.2 182 M
+(# Neither matched) s
+/F-gs-font 7 7 SF
+5 174 M
+(            res.append\(str[i:]\)) s
+5 166 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 166 M
+(break) s
+/F-gs-font 7 7 SF
+5 158 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 158 M
+(# else:) s
+/F-gs-font 7 7 SF
+5 150 M
+(        j = k = -1) s
+5 142 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 142 M
+(if) s
+/F-gs-font 7 7 SF
+47 142 M
+( Omatch: j = Omatch.start\(0\)) s
+5 134 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 134 M
+(if) s
+/F-gs-font 7 7 SF
+47 134 M
+( Qmatch: k = Qmatch.start\(0\)) s
+5 126 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 126 M
+(if) s
+/F-gs-font 7 7 SF
+47 126 M
+( Qmatch ) s
+/Courier-Bold 7 7 SUF
+80.6 126 M
+(and) s
+/F-gs-font 7 7 SF
+93.2 126 M
+( \( ) s
+/Courier-Bold 7 7 SUF
+105.8 126 M
+(not) s
+/F-gs-font 7 7 SF
+118.4 126 M
+( Omatch ) s
+/Courier-Bold 7 7 SUF
+152 126 M
+(or) s
+/F-gs-font 7 7 SF
+160.4 126 M
+( k < j \):    ) s
+/Courier-Oblique 7 7 SUF
+215 126 M
+(# QuotePatt matched) s
+/F-gs-font 7 7 SF
+5 118 M
+(            res.append\(str[i:k]\)) s
+5 110 M
+(            res.append\(str[k+1]\)) s
+5 102 M
+(            i = k+2) s
+5 94 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 94 M
+(else) s
+/F-gs-font 7 7 SF
+55.4 94 M
+(:                                      ) s
+/Courier-Oblique 7 7 SUF
+219.2 94 M
+(# OctalPatt matched) s
+/F-gs-font 7 7 SF
+5 86 M
+(            res.append\(str[i:j]\)) s
+5 78 M
+(            res.append\( chr\( atoi\(str[j+1:j+4], 8\) \) \)) s
+5 70 M
+(            i = j+4) s
+5 62 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 62 M
+(return) s
+/F-gs-font 7 7 SF
+47 62 M
+( join\(res, ) s
+/Courier-Bold 7 7 SUF
+93.2 62 M
+("") s
+/F-gs-font 7 7 SF
+101.6 62 M
+(\)) s
+/Courier-Oblique 7 7 SUF
+5 54 M
+(# end _unquote) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 38 M
+(# The _getdate\(\) routine is used to set the expiration time in) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 30 M
+(# the cookie's HTTP header.      By default, _getdate\(\) returns the) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 22 M
+(# current time in the appropriate "expires" format for a ) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 14 M
+(# Set-Cookie header.    The one optional argument is an offset from) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 6 M
+(# now, in seconds.      For example, an offset of -3600 means "one hour ago".) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 518 M
+(# The offset may be a floating point number.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 510 M
+(#) s
+/F-gs-font 7 7 SF
+377 494 M
+(_weekdayname = [) s
+/Courier-Bold 7 7 SUF
+444.2 494 M
+('Mon') s
+/F-gs-font 7 7 SF
+465.2 494 M
+(, ) s
+/Courier-Bold 7 7 SUF
+473.6 494 M
+('Tue') s
+/F-gs-font 7 7 SF
+494.6 494 M
+(, ) s
+/Courier-Bold 7 7 SUF
+503 494 M
+('Wed') s
+/F-gs-font 7 7 SF
+524 494 M
+(, ) s
+/Courier-Bold 7 7 SUF
+532.4 494 M
+('Thu') s
+/F-gs-font 7 7 SF
+553.4 494 M
+(, ) s
+/Courier-Bold 7 7 SUF
+561.8 494 M
+('Fri') s
+/F-gs-font 7 7 SF
+582.8 494 M
+(, ) s
+/Courier-Bold 7 7 SUF
+591.2 494 M
+('Sat') s
+/F-gs-font 7 7 SF
+612.2 494 M
+(, ) s
+/Courier-Bold 7 7 SUF
+620.6 494 M
+('Sun') s
+/F-gs-font 7 7 SF
+641.6 494 M
+(]) s
+377 478 M
+(_monthname = [None,) s
+377 470 M
+(              ) s
+/Courier-Bold 7 7 SUF
+435.8 470 M
+('Jan') s
+/F-gs-font 7 7 SF
+456.8 470 M
+(, ) s
+/Courier-Bold 7 7 SUF
+465.2 470 M
+('Feb') s
+/F-gs-font 7 7 SF
+486.2 470 M
+(, ) s
+/Courier-Bold 7 7 SUF
+494.6 470 M
+('Mar') s
+/F-gs-font 7 7 SF
+515.6 470 M
+(, ) s
+/Courier-Bold 7 7 SUF
+524 470 M
+('Apr') s
+/F-gs-font 7 7 SF
+545 470 M
+(, ) s
+/Courier-Bold 7 7 SUF
+553.4 470 M
+('May') s
+/F-gs-font 7 7 SF
+574.4 470 M
+(, ) s
+/Courier-Bold 7 7 SUF
+582.8 470 M
+('Jun') s
+/F-gs-font 7 7 SF
+603.8 470 M
+(,) s
+377 462 M
+(              ) s
+/Courier-Bold 7 7 SUF
+435.8 462 M
+('Jul') s
+/F-gs-font 7 7 SF
+456.8 462 M
+(, ) s
+/Courier-Bold 7 7 SUF
+465.2 462 M
+('Aug') s
+/F-gs-font 7 7 SF
+486.2 462 M
+(, ) s
+/Courier-Bold 7 7 SUF
+494.6 462 M
+('Sep') s
+/F-gs-font 7 7 SF
+515.6 462 M
+(, ) s
+/Courier-Bold 7 7 SUF
+524 462 M
+('Oct') s
+/F-gs-font 7 7 SF
+545 462 M
+(, ) s
+/Courier-Bold 7 7 SUF
+553.4 462 M
+('Nov') s
+/F-gs-font 7 7 SF
+574.4 462 M
+(, ) s
+/Courier-Bold 7 7 SUF
+582.8 462 M
+('Dec') s
+/F-gs-font 7 7 SF
+603.8 462 M
+(]) s
+/Courier-Bold 7 7 SUF
+377 446 M
+(def) s
+/F-gs-font 7 7 SF
+389.6 446 M
+( ) s
+/Courier-Bold 7 7 SUF
+393.8 446 M
+(_getdate) s
+/F-gs-font 7 7 SF
+427.4 446 M
+(\(future=0, weekdayname=_weekdayname, monthname=_monthname\):) s
+377 438 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 438 M
+(from) s
+/F-gs-font 7 7 SF
+410.6 438 M
+( time ) s
+/Courier-Bold 7 7 SUF
+435.8 438 M
+(import) s
+/F-gs-font 7 7 SF
+461 438 M
+( gmtime, time) s
+377 430 M
+(    now = time\(\)) s
+377 422 M
+(    year, month, day, hh, mm, ss, wd, y, z = gmtime\(now + future\)) s
+377 414 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 414 M
+(return) s
+/F-gs-font 7 7 SF
+419 414 M
+( ) s
+/Courier-Bold 7 7 SUF
+423.2 414 M
+("%s, %02d-%3s-%4d %02d:%02d:%02d GMT") s
+/F-gs-font 7 7 SF
+578.6 414 M
+( % \\) s
+377 406 M
+(          \(weekdayname[wd], day, monthname[month], year, hh, mm, ss\)) s
+/Courier-Oblique 7 7 SUF
+377 382 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 374 M
+(# A class to hold ONE key,value pair.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 366 M
+(# In a cookie, each such pair may have several attributes.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 358 M
+(#      so this class is used to keep the attributes associated) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 350 M
+(#      with the appropriate key,value pair.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 342 M
+(# This class also includes a coded_value attribute, which) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 334 M
+(#      is used to hold the network representation of the) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 326 M
+(#      value.  This is most useful when Python objects are) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 318 M
+(#      pickled for network transit.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 310 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+377 294 M
+(class) s
+/F-gs-font 7 7 SF
+398 294 M
+( Morsel\(UserDict\):) s
+377 286 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 286 M
+(# RFC 2109 lists these attributes as reserved:) s
+/F-gs-font 7 7 SF
+377 278 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 278 M
+(#  path      comment        domain) s
+/F-gs-font 7 7 SF
+377 270 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 270 M
+(#  max-age    secure      version) s
+/F-gs-font 7 7 SF
+377 262 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 262 M
+(# ) s
+/F-gs-font 7 7 SF
+377 254 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 254 M
+(# For historical reasons, these attributes are also reserved:) s
+/F-gs-font 7 7 SF
+377 246 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 246 M
+(#  expires) s
+/F-gs-font 7 7 SF
+377 238 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 238 M
+(#) s
+/F-gs-font 7 7 SF
+377 230 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 230 M
+(# This dictionary provides a mapping from the lowercase) s
+/F-gs-font 7 7 SF
+377 222 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 222 M
+(# variant on the left to the appropriate Set-Cookie) s
+/F-gs-font 7 7 SF
+377 214 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 214 M
+(# format on the right.) s
+/F-gs-font 7 7 SF
+377 206 M
+(    __reserved = { ) s
+/Courier-Bold 7 7 SUF
+456.8 206 M
+("expires") s
+/F-gs-font 7 7 SF
+494.6 206 M
+( : ) s
+/Courier-Bold 7 7 SUF
+507.2 206 M
+("expires") s
+/F-gs-font 7 7 SF
+545 206 M
+(,) s
+377 198 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+452.6 198 M
+("path") s
+/F-gs-font 7 7 SF
+477.8 198 M
+(        : ) s
+/Courier-Bold 7 7 SUF
+519.8 198 M
+("Path") s
+/F-gs-font 7 7 SF
+545 198 M
+(,) s
+377 190 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+452.6 190 M
+("comment") s
+/F-gs-font 7 7 SF
+490.4 190 M
+( : ) s
+/Courier-Bold 7 7 SUF
+503 190 M
+("Comment") s
+/F-gs-font 7 7 SF
+540.8 190 M
+(,) s
+377 182 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+452.6 182 M
+("domain") s
+/F-gs-font 7 7 SF
+486.2 182 M
+(      : ) s
+/Courier-Bold 7 7 SUF
+519.8 182 M
+("Domain") s
+/F-gs-font 7 7 SF
+553.4 182 M
+(,) s
+377 174 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+452.6 174 M
+("max-age") s
+/F-gs-font 7 7 SF
+490.4 174 M
+( : ) s
+/Courier-Bold 7 7 SUF
+503 174 M
+("Max-Age") s
+/F-gs-font 7 7 SF
+540.8 174 M
+(,) s
+377 166 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+452.6 166 M
+("secure") s
+/F-gs-font 7 7 SF
+486.2 166 M
+(      : ) s
+/Courier-Bold 7 7 SUF
+519.8 166 M
+("secure") s
+/F-gs-font 7 7 SF
+553.4 166 M
+(,) s
+377 158 M
+(                  ) s
+/Courier-Bold 7 7 SUF
+452.6 158 M
+("version") s
+/F-gs-font 7 7 SF
+490.4 158 M
+( : ) s
+/Courier-Bold 7 7 SUF
+503 158 M
+("Version") s
+/F-gs-font 7 7 SF
+540.8 158 M
+(,) s
+377 150 M
+(                  }) s
+377 142 M
+(    __reserved_keys = __reserved.keys\(\)) s
+377 126 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 126 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 126 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 126 M
+(__init__) s
+/F-gs-font 7 7 SF
+444.2 126 M
+(\(self\):) s
+377 118 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 118 M
+(# Set defaults) s
+/F-gs-font 7 7 SF
+377 110 M
+(        self.key = self.value = self.coded_value = None) s
+377 102 M
+(        UserDict.__init__\(self\)) s
+377 86 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 86 M
+(# Set default attributes) s
+/F-gs-font 7 7 SF
+377 78 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 78 M
+(for) s
+/F-gs-font 7 7 SF
+423.2 78 M
+( K ) s
+/Courier-Bold 7 7 SUF
+435.8 78 M
+(in) s
+/F-gs-font 7 7 SF
+444.2 78 M
+( self.__reserved_keys:) s
+377 70 M
+(            UserDict.__setitem__\(self, K, ) s
+/Courier-Bold 7 7 SUF
+553.4 70 M
+("") s
+/F-gs-font 7 7 SF
+561.8 70 M
+(\)) s
+377 62 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 62 M
+(# end __init__) s
+/F-gs-font 7 7 SF
+377 46 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 46 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 46 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 46 M
+(__setitem__) s
+/F-gs-font 7 7 SF
+456.8 46 M
+(\(self, K, V\):) s
+377 38 M
+(        K = string.lower\(K\)) s
+377 30 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 30 M
+(if) s
+/F-gs-font 7 7 SF
+419 30 M
+( ) s
+/Courier-Bold 7 7 SUF
+423.2 30 M
+(not) s
+/F-gs-font 7 7 SF
+435.8 30 M
+( K ) s
+/Courier-Bold 7 7 SUF
+448.4 30 M
+(in) s
+/F-gs-font 7 7 SF
+456.8 30 M
+( self.__reserved_keys:) s
+377 22 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 22 M
+(raise) s
+/F-gs-font 7 7 SF
+448.4 22 M
+( CookieError\() s
+/Courier-Bold 7 7 SUF
+503 22 M
+("Invalid Attribute %s") s
+/F-gs-font 7 7 SF
+595.4 22 M
+( % K\)) s
+377 14 M
+(        UserDict.__setitem__\(self, K, V\)) s
+377 6 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 6 M
+(# end __setitem__) s
+_R
+S
+%%Page: (4) 10
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 4 def
+/fname (SimpleCookie.py) def
+/fdir () def
+/ftail (SimpleCookie.py) def
+/Courier-Oblique 7 7 SUF
+% User defined strings:
+/pagenumstr (4) def
+/moddatestr (09/11/00) def
+/modtimestr (17:40:58) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+/F-gs-font 7 7 SF
+5 510 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 510 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 510 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 510 M
+(set) s
+/F-gs-font 7 7 SF
+51.2 510 M
+(\(self, key, val, coded_val,) s
+5 502 M
+(            LegalChars=_LegalChars,) s
+5 494 M
+(            idmap=string._idmap, translate=string.translate \):) s
+5 486 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 486 M
+(# First we verify that the key isn't a reserved word) s
+/F-gs-font 7 7 SF
+5 478 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 478 M
+(# Second we make sure it only contains legal characters) s
+/F-gs-font 7 7 SF
+5 470 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 470 M
+(if) s
+/F-gs-font 7 7 SF
+47 470 M
+( string.lower\(key\) ) s
+/Courier-Bold 7 7 SUF
+126.8 470 M
+(in) s
+/F-gs-font 7 7 SF
+135.2 470 M
+( self.__reserved_keys:) s
+5 462 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 462 M
+(raise) s
+/F-gs-font 7 7 SF
+76.4 462 M
+( CookieError\() s
+/Courier-Bold 7 7 SUF
+131 462 M
+("Attempt to set a reserved key: %s") s
+/F-gs-font 7 7 SF
+278 462 M
+( % key\)) s
+5 454 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 454 M
+(if) s
+/F-gs-font 7 7 SF
+47 454 M
+( ) s
+/Courier-Bold 7 7 SUF
+51.2 454 M
+("") s
+/F-gs-font 7 7 SF
+59.6 454 M
+( != translate\(key, idmap, LegalChars\):) s
+5 446 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 446 M
+(raise) s
+/F-gs-font 7 7 SF
+76.4 446 M
+( CookieError\() s
+/Courier-Bold 7 7 SUF
+131 446 M
+("Illegal key value: %s") s
+/F-gs-font 7 7 SF
+227.6 446 M
+( % key\)) s
+5 430 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 430 M
+(# It's a good key, so save it.) s
+/F-gs-font 7 7 SF
+5 422 M
+(        self.key                = key) s
+5 414 M
+(        self.value              = val) s
+5 406 M
+(        self.coded_value        = coded_val) s
+5 398 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 398 M
+(# end set) s
+/F-gs-font 7 7 SF
+5 382 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 382 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 382 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 382 M
+(output) s
+/F-gs-font 7 7 SF
+63.8 382 M
+(\(self, header = ) s
+/Courier-Bold 7 7 SUF
+131 382 M
+("Set-Cookie:") s
+/F-gs-font 7 7 SF
+185.6 382 M
+(\):) s
+5 374 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 374 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 374 M
+( ) s
+/Courier-Bold 7 7 SUF
+68 374 M
+("%s %s") s
+/F-gs-font 7 7 SF
+97.4 374 M
+( % \( header, self.OutputString\(\) \)) s
+5 358 M
+(    __repr__ = output) s
+5 342 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 342 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 342 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 342 M
+(js_output) s
+/F-gs-font 7 7 SF
+76.4 342 M
+(\(self\):) s
+5 334 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 334 M
+(# Print javascript) s
+/F-gs-font 7 7 SF
+5 326 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 326 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 326 M
+( ) s
+/Courier-Bold 7 7 SUF
+68 326 M
+(""") s
+5 318 M
+(        <SCRIPT LANGUAGE="JavaScript">) s
+5 310 M
+(        <!-- begin hiding) s
+5 302 M
+(        document.cookie = \\"%s\\") s
+5 294 M
+(        // end hiding -->) s
+5 286 M
+(        </script>) s
+5 278 M
+(        """) s
+/F-gs-font 7 7 SF
+51.2 278 M
+( % \( self.OutputString\(\), \)) s
+5 270 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 270 M
+(# end js_output\(\)) s
+/F-gs-font 7 7 SF
+5 254 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 254 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 254 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 254 M
+(OutputString) s
+/F-gs-font 7 7 SF
+89 254 M
+(\(self\):) s
+5 246 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 246 M
+(# Build up our result) s
+/F-gs-font 7 7 SF
+5 238 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 238 M
+(#) s
+/F-gs-font 7 7 SF
+5 230 M
+(        result = []) s
+5 222 M
+(        RA = result.append) s
+5 214 M
+(        ) s
+5 206 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 206 M
+(# First, the key=value pair) s
+/F-gs-font 7 7 SF
+5 198 M
+(        RA\() s
+/Courier-Bold 7 7 SUF
+51.2 198 M
+("%s=%s;") s
+/F-gs-font 7 7 SF
+84.8 198 M
+( % \(self.key, self.coded_value\)\)) s
+5 182 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 182 M
+(# Now add any defined attributes) s
+/F-gs-font 7 7 SF
+5 174 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 174 M
+(for) s
+/F-gs-font 7 7 SF
+51.2 174 M
+( K,V ) s
+/Courier-Bold 7 7 SUF
+72.2 174 M
+(in) s
+/F-gs-font 7 7 SF
+80.6 174 M
+( self.items\(\):) s
+5 166 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 166 M
+(if) s
+/F-gs-font 7 7 SF
+63.8 166 M
+( ) s
+/Courier-Bold 7 7 SUF
+68 166 M
+(not) s
+/F-gs-font 7 7 SF
+80.6 166 M
+( V: ) s
+/Courier-Bold 7 7 SUF
+97.4 166 M
+(continue) s
+/F-gs-font 7 7 SF
+5 158 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 158 M
+(if) s
+/F-gs-font 7 7 SF
+63.8 158 M
+( K == ) s
+/Courier-Bold 7 7 SUF
+89 158 M
+("expires") s
+/F-gs-font 7 7 SF
+126.8 158 M
+( ) s
+/Courier-Bold 7 7 SUF
+131 158 M
+(and) s
+/F-gs-font 7 7 SF
+143.6 158 M
+( type\(V\) == type\(1\):) s
+5 150 M
+(                RA\() s
+/Courier-Bold 7 7 SUF
+84.8 150 M
+("%s=%s;") s
+/F-gs-font 7 7 SF
+118.4 150 M
+( % \(self.__reserved[K], _getdate\(V\)\)\)) s
+5 142 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 142 M
+(elif) s
+/F-gs-font 7 7 SF
+72.2 142 M
+( K == ) s
+/Courier-Bold 7 7 SUF
+97.4 142 M
+("max-age") s
+/F-gs-font 7 7 SF
+135.2 142 M
+( ) s
+/Courier-Bold 7 7 SUF
+139.4 142 M
+(and) s
+/F-gs-font 7 7 SF
+152 142 M
+( type\(V\) == type\(1\):) s
+5 134 M
+(                RA\() s
+/Courier-Bold 7 7 SUF
+84.8 134 M
+("%s=%d;") s
+/F-gs-font 7 7 SF
+118.4 134 M
+( % \(self.__reserved[K], V\)\)) s
+5 126 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 126 M
+(elif) s
+/F-gs-font 7 7 SF
+72.2 126 M
+( K == ) s
+/Courier-Bold 7 7 SUF
+97.4 126 M
+("secure") s
+/F-gs-font 7 7 SF
+131 126 M
+(:) s
+5 118 M
+(                RA\() s
+/Courier-Bold 7 7 SUF
+84.8 118 M
+("%s;") s
+/F-gs-font 7 7 SF
+105.8 118 M
+( % self.__reserved[K]\)) s
+5 110 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 110 M
+(else) s
+/F-gs-font 7 7 SF
+72.2 110 M
+(:) s
+5 102 M
+(                RA\() s
+/Courier-Bold 7 7 SUF
+84.8 102 M
+("%s=%s;") s
+/F-gs-font 7 7 SF
+118.4 102 M
+( % \(self.__reserved[K], V\)\)) s
+5 94 M
+(                ) s
+5 86 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+38.6 86 M
+(# Return the result) s
+/F-gs-font 7 7 SF
+5 78 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 78 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 78 M
+( string.join\(result, ) s
+/Courier-Bold 7 7 SUF
+152 78 M
+(" ") s
+/F-gs-font 7 7 SF
+164.6 78 M
+(\)) s
+5 70 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 70 M
+(# end OutputString) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 62 M
+(# end Morsel class) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 30 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 22 M
+(# Pattern for finding cookie) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 14 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 6 M
+(# This used to be strict parsing based on the RFC2109 and RFC2068) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 518 M
+(# specifications.  I have since discovered that MSIE 3.0x doesn't) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 510 M
+(# follow the character rules outlined in those specs.  As a) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 502 M
+(# result, the parsing rules here are less strict.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 494 M
+(#) s
+/F-gs-font 7 7 SF
+377 478 M
+(_LegalCharsPatt  = r) s
+/Courier-Bold 7 7 SUF
+461 478 M
+("[\\w\\d!#%&'~_`><@,:/\\$\\*\\+\\-\\.\\^\\|\\\)\\\(\\?\\}\\{]+") s
+/F-gs-font 7 7 SF
+377 470 M
+(_CookiePattern = re.compile\() s
+377 462 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 462 M
+("\(?x\)") s
+/F-gs-font 7 7 SF
+423.2 462 M
+(                      ) s
+/Courier-Oblique 7 7 SUF
+515.6 462 M
+(# This is a Verbose pattern) s
+/F-gs-font 7 7 SF
+377 454 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 454 M
+("\(?P<key>") s
+/F-gs-font 7 7 SF
+440 454 M
+(                  ) s
+/Courier-Oblique 7 7 SUF
+515.6 454 M
+(# Start of group 'key') s
+/F-gs-font 7 7 SF
+377 446 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 446 M
+("") s
+/F-gs-font 7 7 SF
+402.2 446 M
+(+ _LegalCharsPatt +) s
+/Courier-Bold 7 7 SUF
+482 446 M
+("") s
+/F-gs-font 7 7 SF
+490.4 446 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+524 446 M
+(# Any word) s
+/F-gs-font 7 7 SF
+377 438 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 438 M
+("\)") s
+/F-gs-font 7 7 SF
+410.6 438 M
+(                          ) s
+/Courier-Oblique 7 7 SUF
+519.8 438 M
+(# End of group 'key') s
+/F-gs-font 7 7 SF
+377 430 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 430 M
+("\\s*=\\s*") s
+/F-gs-font 7 7 SF
+435.8 430 M
+(                    ) s
+/Courier-Oblique 7 7 SUF
+519.8 430 M
+(# Equal Sign) s
+/F-gs-font 7 7 SF
+377 422 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 422 M
+("\(?P<val>") s
+/F-gs-font 7 7 SF
+440 422 M
+(                  ) s
+/Courier-Oblique 7 7 SUF
+515.6 422 M
+(# Start of group 'val') s
+/F-gs-font 7 7 SF
+377 414 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 414 M
+('"\(?:[^\\\\"]|\\\\.\)*"') s
+/F-gs-font 7 7 SF
+477.8 414 M
+(            ) s
+/Courier-Oblique 7 7 SUF
+528.2 414 M
+(# Any doublequoted string) s
+/F-gs-font 7 7 SF
+377 406 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 406 M
+("|") s
+/F-gs-font 7 7 SF
+410.6 406 M
+(                            ) s
+/Courier-Oblique 7 7 SUF
+528.2 406 M
+(# or) s
+/F-gs-font 7 7 SF
+377 398 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 398 M
+("") s
+/F-gs-font 7 7 SF
+402.2 398 M
+(+ _LegalCharsPatt +) s
+/Courier-Bold 7 7 SUF
+482 398 M
+("") s
+/F-gs-font 7 7 SF
+490.4 398 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+524 398 M
+(# Any word ) s
+/F-gs-font 7 7 SF
+377 390 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 390 M
+("\)") s
+/F-gs-font 7 7 SF
+410.6 390 M
+(                          ) s
+/Courier-Oblique 7 7 SUF
+519.8 390 M
+(# End of group 'val') s
+/F-gs-font 7 7 SF
+377 382 M
+(    r) s
+/Courier-Bold 7 7 SUF
+398 382 M
+("\\s*;?") s
+/F-gs-font 7 7 SF
+427.4 382 M
+(                      ) s
+/Courier-Oblique 7 7 SUF
+519.8 382 M
+(# Probably ending in a semi-colon) s
+/F-gs-font 7 7 SF
+377 374 M
+(    \)) s
+/Courier-Oblique 7 7 SUF
+377 350 M
+(# At long last, here is the cookie class.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 342 M
+(#  Using this class is almost just like using a dictionary.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 334 M
+(# See this module's docstring for example usage.) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 326 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+377 318 M
+(class) s
+/F-gs-font 7 7 SF
+398 318 M
+( BaseCookie\(UserDict\):) s
+377 310 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 310 M
+(# A container class for a set of Morsels) s
+/F-gs-font 7 7 SF
+377 302 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 302 M
+(#) s
+/F-gs-font 7 7 SF
+377 294 M
+(    ) s
+377 286 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 286 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 286 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 286 M
+(net_setfunc) s
+/F-gs-font 7 7 SF
+456.8 286 M
+(\(self, strval\):) s
+377 278 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 278 M
+("""net_setfunc\(STRING\)) s
+377 270 M
+(        Called prior to setting a cookie's value from the network) s
+377 262 M
+(        representation.  The STRING is the value read from HTTP) s
+377 254 M
+(        header.) s
+377 246 M
+(        Override this function to modify the behavior of cookies.) s
+377 238 M
+(        """) s
+/F-gs-font 7 7 SF
+377 230 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 230 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 230 M
+( strval) s
+377 222 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 222 M
+(# end net_setfunc) s
+/F-gs-font 7 7 SF
+377 206 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 206 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 206 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 206 M
+(user_setfunc) s
+/F-gs-font 7 7 SF
+461 206 M
+(\(self, strval\):) s
+377 198 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 198 M
+("""user_setfunc\(STRING\)) s
+377 190 M
+(        Called prior to setting a cookie's value from the dictionary) s
+377 182 M
+(        representation.  The STRING is the value being assigned.) s
+377 174 M
+(        Override this function to modify the behavior of cookies.) s
+377 166 M
+(        """) s
+/F-gs-font 7 7 SF
+377 158 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 158 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 158 M
+( strval) s
+377 150 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 150 M
+(# end user_setfunc) s
+/F-gs-font 7 7 SF
+377 142 M
+(    ) s
+377 134 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 134 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 134 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 134 M
+(__init__) s
+/F-gs-font 7 7 SF
+444.2 134 M
+(\(self, input=None, net_setfunc=None, user_setfunc=None\):) s
+377 126 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 126 M
+(if) s
+/F-gs-font 7 7 SF
+419 126 M
+( net_setfunc:) s
+377 118 M
+(            ) s
+/Courier-Oblique 7 7 SUF
+427.4 118 M
+(# Backwards compatible way to override method) s
+/F-gs-font 7 7 SF
+377 110 M
+(            self.net_setfunc  = ) s
+/Courier-Bold 7 7 SUF
+511.4 110 M
+(lambda) s
+/F-gs-font 7 7 SF
+536.6 110 M
+( s,x: net_setfunc\(x\)) s
+377 102 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 102 M
+(if) s
+/F-gs-font 7 7 SF
+419 102 M
+( user_setfunc:) s
+377 94 M
+(            ) s
+/Courier-Oblique 7 7 SUF
+427.4 94 M
+(# Backwards compatible way to override method) s
+/F-gs-font 7 7 SF
+377 86 M
+(            self.user_setfunc = ) s
+/Courier-Bold 7 7 SUF
+511.4 86 M
+(lambda) s
+/F-gs-font 7 7 SF
+536.6 86 M
+( s,x: user_setfunc\(x\)) s
+377 78 M
+(        UserDict.__init__\(self\)) s
+377 70 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 70 M
+(if) s
+/F-gs-font 7 7 SF
+419 70 M
+( input: self.load\(input\)) s
+377 62 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 62 M
+(# end __init__) s
+/F-gs-font 7 7 SF
+377 46 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 46 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 46 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 46 M
+(__setitem__) s
+/F-gs-font 7 7 SF
+456.8 46 M
+(\(self, key, value\):) s
+377 38 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 38 M
+("""Dictionary style assignment.""") s
+/F-gs-font 7 7 SF
+377 30 M
+(        M = self.get\(key, Morsel\(\)\)) s
+377 22 M
+(        M.set\(key, value, apply\(self.user_setfunc, \(value,\)\)\)) s
+377 14 M
+(        UserDict.__setitem__\(self, key, M\)) s
+377 6 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+393.8 6 M
+(# end __setitem__) s
+_R
+S
+%%Page: (5) 11
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 5 def
+/fname (SimpleCookie.py) def
+/fdir () def
+/ftail (SimpleCookie.py) def
+/Courier-Oblique 7 7 SUF
+% User defined strings:
+/pagenumstr (5) def
+/moddatestr (09/11/00) def
+/modtimestr (17:40:58) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+/F-gs-font 7 7 SF
+5 510 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 510 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 510 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 510 M
+(output) s
+/F-gs-font 7 7 SF
+63.8 510 M
+(\(self, header=) s
+/Courier-Bold 7 7 SUF
+122.6 510 M
+("Set-Cookie:") s
+/F-gs-font 7 7 SF
+177.2 510 M
+(\):) s
+5 502 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 502 M
+("""Return a string suitable for HTTP.""") s
+/F-gs-font 7 7 SF
+5 494 M
+(        result = []) s
+5 486 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 486 M
+(for) s
+/F-gs-font 7 7 SF
+51.2 486 M
+( K,V ) s
+/Courier-Bold 7 7 SUF
+72.2 486 M
+(in) s
+/F-gs-font 7 7 SF
+80.6 486 M
+( self.items\(\):) s
+5 478 M
+(            result.append\( V.output\(header\) \)) s
+5 470 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 470 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 470 M
+( string.join\(result,) s
+/Courier-Bold 7 7 SUF
+147.8 470 M
+("\\n") s
+/F-gs-font 7 7 SF
+164.6 470 M
+(\)) s
+5 462 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 462 M
+(# end output) s
+/F-gs-font 7 7 SF
+5 446 M
+(    __repr__ = output) s
+5 438 M
+(        ) s
+5 430 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 430 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 430 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 430 M
+(js_output) s
+/F-gs-font 7 7 SF
+76.4 430 M
+(\(self\):) s
+5 422 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 422 M
+("""Return a string suitable for JavaScript.""") s
+/F-gs-font 7 7 SF
+5 414 M
+(        result = []) s
+5 406 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 406 M
+(for) s
+/F-gs-font 7 7 SF
+51.2 406 M
+( K,V ) s
+/Courier-Bold 7 7 SUF
+72.2 406 M
+(in) s
+/F-gs-font 7 7 SF
+80.6 406 M
+( self.items\(\):) s
+5 398 M
+(            result.append\( V.js_output\(\) \)) s
+5 390 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 390 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 390 M
+( string.join\(result, ) s
+/Courier-Bold 7 7 SUF
+152 390 M
+("") s
+/F-gs-font 7 7 SF
+160.4 390 M
+(\)) s
+5 382 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 382 M
+(# end js_output) s
+/F-gs-font 7 7 SF
+5 366 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 366 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 366 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 366 M
+(load) s
+/F-gs-font 7 7 SF
+55.4 366 M
+(\(self, rawdata\):) s
+5 358 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 358 M
+("""Load cookies from a string \(presumably HTTP_COOKIE\) or) s
+5 350 M
+(        from a dictionary.  Loading cookies from a dictionary 'd') s
+5 342 M
+(        is equivalent to calling:) s
+5 334 M
+(            map\(Cookie.__setitem__, d.keys\(\), d.values\(\)\)) s
+5 326 M
+(        Unfortunately, this does NOT allow merging of two Cookie) s
+5 318 M
+(        dictionaries!) s
+5 310 M
+(        """) s
+/F-gs-font 7 7 SF
+5 302 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 302 M
+(if) s
+/F-gs-font 7 7 SF
+47 302 M
+( type\(rawdata\) == type\() s
+/Courier-Bold 7 7 SUF
+143.6 302 M
+("") s
+/F-gs-font 7 7 SF
+152 302 M
+(\):) s
+5 294 M
+(            self.__ParseString\(rawdata\)) s
+5 286 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 286 M
+(else) s
+/F-gs-font 7 7 SF
+55.4 286 M
+(:) s
+5 278 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 278 M
+(for) s
+/F-gs-font 7 7 SF
+68 278 M
+( K,V ) s
+/Courier-Bold 7 7 SUF
+89 278 M
+(in) s
+/F-gs-font 7 7 SF
+97.4 278 M
+( rawdata.items\(\):) s
+5 270 M
+(                self[K] = V) s
+5 262 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 262 M
+(return) s
+/F-gs-font 7 7 SF
+5 254 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 254 M
+(# end load\(\)) s
+/F-gs-font 7 7 SF
+5 246 M
+(        ) s
+5 238 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 238 M
+(def) s
+/F-gs-font 7 7 SF
+34.4 238 M
+( ) s
+/Courier-Bold 7 7 SUF
+38.6 238 M
+(__ParseString) s
+/F-gs-font 7 7 SF
+93.2 238 M
+(\(self, str, patt=_CookiePattern\):) s
+5 230 M
+(        i = 0            ) s
+/Courier-Oblique 7 7 SUF
+110 230 M
+(# Our starting point) s
+/F-gs-font 7 7 SF
+5 222 M
+(        n = len\(str\)    ) s
+/Courier-Oblique 7 7 SUF
+105.8 222 M
+(# Length of string) s
+/F-gs-font 7 7 SF
+5 214 M
+(        M = None        ) s
+/Courier-Oblique 7 7 SUF
+105.8 214 M
+(# Current morsel) s
+/F-gs-font 7 7 SF
+5 198 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 198 M
+(while) s
+/F-gs-font 7 7 SF
+59.6 198 M
+( 0 <= i < n:) s
+5 190 M
+(            ) s
+/Courier-Oblique 7 7 SUF
+55.4 190 M
+(# Start looking for a cookie) s
+/F-gs-font 7 7 SF
+5 182 M
+(            match = patt.search\(str, i\)) s
+5 174 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 174 M
+(if) s
+/F-gs-font 7 7 SF
+63.8 174 M
+( ) s
+/Courier-Bold 7 7 SUF
+68 174 M
+(not) s
+/F-gs-font 7 7 SF
+80.6 174 M
+( match: ) s
+/Courier-Bold 7 7 SUF
+114.2 174 M
+(break) s
+/F-gs-font 7 7 SF
+135.2 174 M
+(          ) s
+/Courier-Oblique 7 7 SUF
+177.2 174 M
+(# No more cookies) s
+/F-gs-font 7 7 SF
+5 158 M
+(            K,V = match.group\() s
+/Courier-Bold 7 7 SUF
+131 158 M
+("key") s
+/F-gs-font 7 7 SF
+152 158 M
+(\), match.group\() s
+/Courier-Bold 7 7 SUF
+215 158 M
+("val") s
+/F-gs-font 7 7 SF
+236 158 M
+(\)) s
+5 150 M
+(            i = match.end\(0\)) s
+5 134 M
+(            ) s
+/Courier-Oblique 7 7 SUF
+55.4 134 M
+(# Parse the key, value in case it's metainfo) s
+/F-gs-font 7 7 SF
+5 126 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 126 M
+(if) s
+/F-gs-font 7 7 SF
+63.8 126 M
+( K[0] == ) s
+/Courier-Bold 7 7 SUF
+101.6 126 M
+("$") s
+/F-gs-font 7 7 SF
+114.2 126 M
+(:) s
+5 118 M
+(                ) s
+/Courier-Oblique 7 7 SUF
+72.2 118 M
+(# We ignore attributes which pertain to the cookie) s
+/F-gs-font 7 7 SF
+5 110 M
+(                ) s
+/Courier-Oblique 7 7 SUF
+72.2 110 M
+(# mechanism as a whole.  See RFC 2109.) s
+/F-gs-font 7 7 SF
+5 102 M
+(                ) s
+/Courier-Oblique 7 7 SUF
+72.2 102 M
+(# \(Does anyone care?\)) s
+/F-gs-font 7 7 SF
+5 94 M
+(                ) s
+/Courier-Bold 7 7 SUF
+72.2 94 M
+(if) s
+/F-gs-font 7 7 SF
+80.6 94 M
+( M:) s
+5 86 M
+(                    M[ K[1:] ] = V) s
+5 78 M
+(            ) s
+/Courier-Bold 7 7 SUF
+55.4 78 M
+(else) s
+/F-gs-font 7 7 SF
+72.2 78 M
+(:) s
+5 70 M
+(                M = Morsel\(\)) s
+5 62 M
+(                M.set\(K, apply\(self.net_setfunc, \(V,\)\), V\)) s
+5 54 M
+(                UserDict.__setitem__\(self, K, M\)) s
+5 46 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 46 M
+(return) s
+/F-gs-font 7 7 SF
+5 38 M
+(    ) s
+/Courier-Oblique 7 7 SUF
+21.8 38 M
+(# end __ParseString) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 30 M
+(# end BaseCookie class) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+5 14 M
+(class) s
+/F-gs-font 7 7 SF
+26 14 M
+( SimpleCookie\(BaseCookie\):) s
+5 6 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 6 M
+("""SimpleCookie) s
+377 518 M
+(    SimpleCookie supports strings as cookie values.  When setting) s
+377 510 M
+(    the value using the dictionary assignment notation, SimpleCookie) s
+377 502 M
+(    calls the builtin str\(\) to convert the value to a string.  Values) s
+377 494 M
+(    received from HTTP are kept as strings.) s
+377 486 M
+(    """) s
+/F-gs-font 7 7 SF
+377 478 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 478 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 478 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 478 M
+(net_setfunc) s
+/F-gs-font 7 7 SF
+456.8 478 M
+(\(self, val\):) s
+377 470 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 470 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 470 M
+( _unquote\( val \)) s
+377 462 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 462 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 462 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 462 M
+(user_setfunc) s
+/F-gs-font 7 7 SF
+461 462 M
+(\(self, val\):) s
+377 454 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 454 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 454 M
+( _quote\( str\(val\) \)) s
+/Courier-Oblique 7 7 SUF
+377 446 M
+(# end SimpleCookie) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+377 430 M
+(class) s
+/F-gs-font 7 7 SF
+398 430 M
+( SerialCookie\(BaseCookie\):) s
+377 422 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 422 M
+("""SerialCookie) s
+377 414 M
+(    SerialCookie supports arbitrary objects as cookie values. All) s
+377 406 M
+(    values are serialized \(using cPickle\) before being sent to the) s
+377 398 M
+(    client.  All incoming values are assumed to be valid Pickle) s
+377 390 M
+(    representations.  IF AN INCOMING VALUE IS NOT IN A VALID PICKLE) s
+377 382 M
+(    FORMAT, THEN AN EXCEPTION WILL BE RAISED.) s
+377 366 M
+(    Note: Large cookie values add overhead because they must be) s
+377 358 M
+(    retransmitted on every HTTP transaction.) s
+377 350 M
+(    ) s
+377 342 M
+(    Note: HTTP has a 2k limit on the size of a cookie.  This class) s
+377 334 M
+(    does not check for this limit, so be careful!!!) s
+377 326 M
+(    """) s
+/F-gs-font 7 7 SF
+377 318 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 318 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 318 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 318 M
+(net_setfunc) s
+/F-gs-font 7 7 SF
+456.8 318 M
+(\(self, val\):) s
+377 310 M
+(        ) s
+/Courier-Oblique 7 7 SUF
+410.6 310 M
+(# This could raise an exception!) s
+/F-gs-font 7 7 SF
+377 302 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 302 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 302 M
+( loads\( _unquote\(val\) \)) s
+377 294 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 294 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 294 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 294 M
+(user_setfunc) s
+/F-gs-font 7 7 SF
+461 294 M
+(\(self, val\):) s
+377 286 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 286 M
+(return) s
+/F-gs-font 7 7 SF
+435.8 286 M
+( _quote\( dumps\(val\) \)) s
+/Courier-Oblique 7 7 SUF
+377 278 M
+(# end SerialCookie) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+377 262 M
+(class) s
+/F-gs-font 7 7 SF
+398 262 M
+( SmartCookie\(BaseCookie\):) s
+377 254 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 254 M
+("""SmartCookie) s
+377 246 M
+(    SmartCookie supports arbitrary objects as cookie values.  If the) s
+377 238 M
+(    object is a string, then it is quoted.  If the object is not a) s
+377 230 M
+(    string, however, then SmartCookie will use cPickle to serialize) s
+377 222 M
+(    the object into a string representation.) s
+377 206 M
+(    Note: Large cookie values add overhead because they must be) s
+377 198 M
+(    retransmitted on every HTTP transaction.) s
+377 190 M
+(    ) s
+377 182 M
+(    Note: HTTP has a 2k limit on the size of a cookie.  This class) s
+377 174 M
+(    does not check for this limit, so be careful!!!) s
+377 166 M
+(    """) s
+/F-gs-font 7 7 SF
+377 158 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 158 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 158 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 158 M
+(net_setfunc) s
+/F-gs-font 7 7 SF
+456.8 158 M
+(\(self, val\):) s
+377 150 M
+(        strval = _unquote\(val\)) s
+377 142 M
+(        try:) s
+377 134 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 134 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 134 M
+( loads\(strval\)) s
+377 126 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 126 M
+(except) s
+/F-gs-font 7 7 SF
+435.8 126 M
+(:) s
+377 118 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 118 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 118 M
+( strval) s
+377 110 M
+(    ) s
+/Courier-Bold 7 7 SUF
+393.8 110 M
+(def) s
+/F-gs-font 7 7 SF
+406.4 110 M
+( ) s
+/Courier-Bold 7 7 SUF
+410.6 110 M
+(user_setfunc) s
+/F-gs-font 7 7 SF
+461 110 M
+(\(self, val\):) s
+377 102 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 102 M
+(if) s
+/F-gs-font 7 7 SF
+419 102 M
+( type\(val\) == type\() s
+/Courier-Bold 7 7 SUF
+498.8 102 M
+("") s
+/F-gs-font 7 7 SF
+507.2 102 M
+(\):) s
+377 94 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 94 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 94 M
+( _quote\(val\)) s
+377 86 M
+(        ) s
+/Courier-Bold 7 7 SUF
+410.6 86 M
+(else) s
+/F-gs-font 7 7 SF
+427.4 86 M
+(:) s
+377 78 M
+(            ) s
+/Courier-Bold 7 7 SUF
+427.4 78 M
+(return) s
+/F-gs-font 7 7 SF
+452.6 78 M
+( _quote\( dumps\(val\) \)) s
+/Courier-Oblique 7 7 SUF
+377 70 M
+(# end SmartCookie) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 46 M
+(###########################################################) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 38 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 30 M
+(# Backwards Compatibility) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 22 M
+(#  Don't break any existing code!) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+377 14 M
+(#) s
+/F-gs-font 7 7 SF
+377 6 M
+(Cookie = SmartCookie        ) s
+_R
+S
+%%Page: (6) 12
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 6 def
+/fname (SimpleCookie.py) def
+/fdir () def
+/ftail (SimpleCookie.py) def
+% User defined strings:
+/pagenumstr (6) def
+/moddatestr (09/11/00) def
+/modtimestr (17:40:58) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+/Courier-Bold 7 7 SUF
+5 518 M
+(def) s
+/F-gs-font 7 7 SF
+17.6 518 M
+( ) s
+/Courier-Bold 7 7 SUF
+21.8 518 M
+(_babelize) s
+/F-gs-font 7 7 SF
+59.6 518 M
+(\(val, dumps=dumps\):) s
+5 510 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 510 M
+(if) s
+/F-gs-font 7 7 SF
+30.2 510 M
+( type\(val\) == type\() s
+/Courier-Bold 7 7 SUF
+110 510 M
+("") s
+/F-gs-font 7 7 SF
+118.4 510 M
+(\):) s
+5 502 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 502 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 502 M
+( _quote\(val\)) s
+5 494 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 494 M
+(else) s
+/F-gs-font 7 7 SF
+38.6 494 M
+(:) s
+5 486 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 486 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 486 M
+( _quote\( dumps\(val\) \)) s
+/Courier-Oblique 7 7 SUF
+5 478 M
+(# end _babelize) s
+/F-gs-font 7 7 SF
+/Courier-Bold 7 7 SUF
+5 470 M
+(def) s
+/F-gs-font 7 7 SF
+17.6 470 M
+( ) s
+/Courier-Bold 7 7 SUF
+21.8 470 M
+(_debabelize) s
+/F-gs-font 7 7 SF
+68 470 M
+(\(val, loads=loads\):) s
+5 462 M
+(    str = _unquote\(val\)) s
+5 454 M
+(    try:) s
+5 446 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 446 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 446 M
+( loads\(str\)) s
+5 438 M
+(    ) s
+/Courier-Bold 7 7 SUF
+21.8 438 M
+(except) s
+/F-gs-font 7 7 SF
+47 438 M
+(:) s
+5 430 M
+(        ) s
+/Courier-Bold 7 7 SUF
+38.6 430 M
+(return) s
+/F-gs-font 7 7 SF
+63.8 430 M
+( str) s
+/Courier-Oblique 7 7 SUF
+5 422 M
+(# end _debabelize) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 414 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 406 M
+(###########################################################) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 374 M
+(#) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 366 M
+(# should add a test routine?) s
+/F-gs-font 7 7 SF
+/Courier-Oblique 7 7 SUF
+5 358 M
+(#) s
+/F-gs-font 7 7 SF
+_R
+S
+%%Trailer
+%%Pages: 12
+%%DocumentNeededResources: font Times-Roman Courier-Oblique Courier-Bold 
+%%+ font Courier Times-Bold 
+%%EOF

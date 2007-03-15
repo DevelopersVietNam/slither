@@ -1,0 +1,64 @@
+#
+# Driver specific configuration
+# 
+#LOG_FILE_NAME = '/home/pshafae/www/cgi-bin/SlitherFiles/logs/Driver'
+#PATH_FILE     = '/home/pshafae/www/cgi-bin/slither/pythonpathrc'
+
+
+#
+# 
+#
+
+# slither projects webroot
+sp_webroot = '/home/pshafae/www/cgi-bin/slither_projects'
+
+
+TestProject = {
+   'webroot' : '%s/TestProject'%( sp_webroot ),
+   'project_module' : 'MyProjectModule',
+   'project_class' : 'MyProjectClass',
+}
+
+
+ShoppingPortal = {
+   'webroot' : '%s/ShoppingPortal'%( sp_webroot ),
+   'project_module' : 'ShoppingPortal',
+   'project_class' : 'ShoppingPortal',
+}
+
+SlyWiki = {
+   'webroot' : '%s/SlyWiki2'%( sp_webroot ),
+   'project_module' : 'MyProjectModule',
+   'project_class' : 'MyProjectClass',
+}
+
+NumberGame = {
+   'webroot' : '%s/NumberGame'%( sp_webroot ),
+   'project_module' : 'NumberGame',
+   'project_class' : 'NumberGame',
+}
+
+SiteControl = {
+   'webroot' : '/home/pshafae/www/cgi-bin/SiteControl',
+   'project_module' : 'SiteControl',
+   'project_class' : 'SiteControl',
+}
+
+
+ClosedCustomer = {
+   'webroot' : '/home/pshafae/www/cgi-bin/ClosedCustomerDNR',
+   'project_module' : 'ClosedCustomer',
+   'project_class' : 'ClosedCustomer',
+}
+
+
+projects = {
+
+   'TestProject' : TestProject,
+   'SlitherShopping' : ShoppingPortal,
+   'SlyWiki' : SlyWiki,
+   'NumberGame' : NumberGame,
+   'SiteControl' : SiteControl,
+   'ClosedCustomer' : ClosedCustomer, 
+
+}

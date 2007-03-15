@@ -1,0 +1,9 @@
+/home/pshafae/www/cgi-bin
+/home/pshafae/www/cgi-bin/slither
+/home/pshafae/www/cgi-bin/zpt_libs
+
+# Needed by legacy hwModules calls in hall
++/home/pshafae/www/cgi-bin/hwModules
+-/home/pshafae/www/cgi-bin/hwModules/hwDB
+-/home/pshafae/www/cgi-bin/hwModules/hwPath
+#+/home/pshafae/www/cgi-bin/hwmodules/Pegasus2/SOAPpy97

@@ -1,0 +1,10 @@
+This is the Slither 2.0 release.
+
+Before you can do anything with Slither, you must edit all of the files
+having a .in suffix for your configuration. 
+
+In all likelihood, a script will be provided in the future. But it must be 
+done by hand at present.
+
+Also, please note that the "wpl" libraries are now included in the Slither
+directory proper.
