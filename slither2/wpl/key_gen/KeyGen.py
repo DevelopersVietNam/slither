@@ -33,7 +33,7 @@
 
 # Standard imports
 import string
-import whrandom
+import random
 import time
 
 
@@ -56,7 +56,7 @@ def generate_key( length=10, char_set='all' ):
     key = ''
     i = 0
     while i < length:
-        key = string.join( [ key , char_list[ whrandom.randint( 0, char_list_limit ) ] ], '' )
+        key = string.join( [ key , char_list[ random.randint( 0, char_list_limit ) ] ], '' )
         i = i + 1
 
     return key 

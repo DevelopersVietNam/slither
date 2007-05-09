@@ -47,7 +47,6 @@ class CGIRequest( UserDict.UserDict ):
 
     def __init__( self ):
 
-
         self.form = {}
         self.env = os.environ
         self.cookies = {}

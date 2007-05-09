@@ -1,4 +1,4 @@
-#!/usr/local/python2.1/bin/python
+#!/usr/bin/env python
 """
 
     Slither is a CGI based Web portal and software development framework 
@@ -59,7 +59,7 @@ PANIC_HTML = 'Panic.html'
 
 
 class Driver:
-
+    "This is the entry point for all Slither applications."
 
     def __init__( self, argv ):
 
@@ -67,7 +67,8 @@ class Driver:
         # attempt to import DriverConf
         self.driver_conf = None
         try:
-            self.driver_conf = __import__( "DriverConf" )
+            import DriverConf
+            self.driver_conf = DriverConf
         except:
             self.driver_conf = None
 
@@ -152,7 +153,7 @@ class Driver:
             except:
                 # an error occured during dispatching
                 sys.stdout = project_profile['project'].stdout_save
-                error_msg = "Project '%s' experienced errors during execution.\n"%( project_profile['project_name'] )
+                error_msg = "Project '%s' experienced errors during execution.\n" % ( project_profile['project_name'] )
                 self.logger.writeError( error_msg ) 
                 change_cwd( self.__driver_path )
                 self.__panic( "Fatal project execution error.", error_msg, traceBack() )
@@ -223,6 +224,7 @@ class Driver:
             self.logger.writeDebug( "Imported project module!" )
 
             # create new instance of the project
+            project = None
             instance_code = "project = project_module.%s()"%( project_profile['project_class'] ) 
 
             self.logger.writeDebug( "Executing instance_code : %s"%( instance_code ) ) 
@@ -246,7 +248,7 @@ class Driver:
             return ( project_profile , "Successfully loaded project '%s'."%( project_name ), "" )
 
         except LoadException, details:
-            error_msg = "Invalid project properties. %s"%( details )
+            error_msg = "Invalid project properties. %s" % ( details )
 
             tb = ""
 
@@ -407,6 +409,6 @@ class Driver:
 if __name__ == '__main__':
 
 
-   d = Driver( sys.argv )
-   d.process()
+    d = Driver( sys.argv )
+    d.process()
  

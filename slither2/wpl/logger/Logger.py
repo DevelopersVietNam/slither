@@ -40,8 +40,9 @@ import os.path
 #sys.stderr.write( "path = %s"%( sys.path ) )
 
 if os.name == 'posix':
-  import FCNTL
   import fcntl
+  # GKT
+  FCNTL = fcntl
 
 
 # Non-Standard Imports

@@ -99,7 +99,9 @@ class SimpleWriter:
   def evaluate(self, evalEnv):
     # This is to play it safe. If performance suffers, I can eliminate
     # this statement.
-    myEvalEnv = evalEnv.copy()
+    myEvalEnv = {}
+    myEvalEnv.update(evalEnv)
+    #myEvalEnv = evalEnv.copy()
     result = ''
     for expr in self.rep:
       if type(expr) == type(''):

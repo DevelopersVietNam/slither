@@ -36,9 +36,9 @@ class StateInterfaceException( Exception ):
 
     def __get_value( self ):
         if type( self.__value ) == type( "" ):
-           return self.__value
+            return self.__value
         else:
-           return `self.__value`
+            return `self.__value`
 
 
 
@@ -54,9 +54,9 @@ class LoadException( Exception ):
 
     def __get_value( self ):
         if type( self.__value ) == type( "" ):
-           return self.__value
+            return self.__value
         else:
-           return `self.__value`
+            return `self.__value`
 
 
 
@@ -72,6 +72,6 @@ class StageProcessException( Exception ):
 
     def __get_value( self ):
         if type( self.__value ) == type( "" ):
-           return self.__value
+            return self.__value
         else:
-           return `self.__value`
+            return `self.__value`
