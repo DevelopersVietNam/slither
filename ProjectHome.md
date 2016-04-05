@@ -1,0 +1,7 @@
+Slither is a web framework that was presented as part of _Web Programming in Python_, co-authored by George K. Thiruvathukal, John P. Shafaee, and Thomas W. Christopher. The book has since gone out of print but will be re-released in a FOSS-compatible form within the next few months. (We will post PDF for the original book here for those who might want to learn more about Free/Open Source development.)
+
+Slither is not a standalone web server implementation (e.g. Tomcat/J2EE, Django, Ruby on Rails, etc.) Instead it works entirely within the Apache Web Server setup, yet has a programming interface similar to what you'd find in Java Servlets (but at a higher level).
+
+You can run Slither either via Common Gateway Interface (CGI) or mod\_python. While one might question whether anyone would want to do this given the many persistent web application development frameworks out there, we continue to receive many inquiries from people who are basically saying, 'I need something like Slither, because my hosting provider or institution won't allow me to run XYZ...or words to that effect.' There is also something to be said about 'running through Apache'. It has a long history, is well-tested, well-supported, scalable and reasonably secure! (Well, these are all true when you know WTH you are doing.)
+
+We have just released the [Slither Installation](SlitherInstallation.md) guide, which will help you to get started with running Slither within Apache/CGI.
